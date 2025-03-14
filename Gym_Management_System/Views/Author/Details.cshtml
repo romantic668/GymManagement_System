@@ -1,0 +1,123 @@
+<!-- Details.cshtml in GymManagement/Views/Author folder-->
+@model List<Author>
+@{
+    int counter = 1;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="@Url.Action("Create", "Author")" class="btn custom-btn">Create</a>
+
+    <form method="get" action="@Url.Action("Details", "Author")" class="input-group"
+        style="width: 300px; position: relative;">
+        <input type="text" id="searchQuery" name="searchQuery" class="form-control"
+            placeholder="Search authors by name..." value="@Context.Request.Query["searchQuery"]" />
+
+        <span id="clearSearchBtn" onclick="clearSearch()" class="position-absolute translate-middle-y me-3" style="cursor: pointer; position: absolute; right: 22%; top: 50%; transform: translateY(-50%);
+                   display: none; z-index: 10;">
+            <i class="bi bi-x-circle fs-5 text-secondary"></i>
+        </span>
+
+        <button type="submit" class="btn custom-btn">Search</button>
+    </form>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Books</th>
+            <th>Methods</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var author in Model)
+        {
+            <tr>
+                <td>@counter</td>
+                <td>@author.Name</td>
+                <td>
+                    <ul>
+                        @foreach (var book in author.Books)
+                        {
+                            <li>@book.Title</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "Author", new { id = author.AuthorId })" class="custom-link">Edit</a>
+                    <a href="#" class="custom-delete delete-button" data-author-id="@author.AuthorId">Delete</a>
+                </td>
+            </tr>
+            counter++;
+        }
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("searchQuery");
+        let clearBtn = document.getElementById("clearSearchBtn");
+
+        if (!searchInput || !clearBtn) {
+            console.error("searchQuery or clearSearchBtn is not find");
+            return;
+        }
+
+        searchInput.addEventListener("input", function () {
+            if (searchInput.value.trim() !== "") {
+                clearBtn.style.display = "block";
+            } else {
+                clearBtn.style.display = "none";
+            }
+        });
+
+        window.clearSearch = function () {
+            searchInput.value = "";
+            clearBtn.style.display = "none";
+            searchInput.focus();
+            window.location.href = window.location.pathname;
+        };
+
+        clearBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            clearSearch();
+        });
+
+        if (searchInput.value.trim() !== "") {
+            clearBtn.style.display = "block";
+        }
+
+        //  DELETE Author
+        document.querySelectorAll(".delete-button").forEach(button => {
+            button.addEventListener("click", function () {
+                let authorId = this.getAttribute("data-author-id");
+
+                if (!authorId) {
+                    alert("Error: No author ID provided.");
+                    return;
+                }
+
+                if (confirm("Are you sure you want to delete this author?")) {
+                    fetch(`/Author/Delete`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ id: parseInt(authorId) })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("Author deleted successfully!");
+                                window.location.reload();
+                            } else {
+                                alert("Error: " + data.message);
+                            }
+                        })
+                        .catch(error => console.error("Error:", error));
+                }
+            });
+        });
+    });
+</script>

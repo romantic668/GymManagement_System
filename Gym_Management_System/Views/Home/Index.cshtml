@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center home-page">
+    <h1>Welcome to Library Management System </h1>
+    <p>Effortlessly manage your books, authors, customers, and library branches.
+        Keep track of inventory, borrowings, and returns with ease.</p>
+    <a asp-controller="Book" asp-action="Details" class="btn btn-primary start-btn">Get Started</a>
+    <div class="library-congratulation">
+        <h2>Over 500,000 Happy Customers 🎉</h2>
+        <p>
+            GymManagement has been built from the ground up based directly on user feedback. </p>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-primary start-btn">Login / Sign up</a>
+
+        <img class="doll" src="https://www.libib.com/img/public/sully-testimonials-01.svg"></img>
+    </div>
+    <div class="partners-container">
+        <p>We play nice with</p>
+        <div class="scrolling-wrapper">
+            <div class="logos">
+                <img src="https://exlibrisgroup.com/wp-content/uploads/cas_max_logo_0.png" alt="CAS">
+                <img src="https://exlibrisgroup.com/wp-content/uploads/Springshare-logo.png" alt="Springshare">
+                <img src="https://exlibrisgroup.com/wp-content/uploads/768px-HathiTrust_logo.png" alt="HathiTrust">
+                <img src="https://exlibrisgroup.com/wp-content/uploads/openathens-web-logo-148.png" alt="openathens">
+                <img src="https://exlibrisgroup.com/wp-content/uploads/ILLiad_Logo_178x58.png" alt="ILLiad">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const logosContainer = document.querySelector(".logos");
+            logosContainer.innerHTML += logosContainer.innerHTML;
+            logosContainer.style.transform = "translateX(0)";
+            function duplicateLogos() {
+                const clone = logosContainer.cloneNode(true);
+                clone.classList.add("duplicate");
+                logosContainer.parentElement.appendChild(clone);
+            }
+
+            duplicateLogos();
+        });
+    </script>
+}

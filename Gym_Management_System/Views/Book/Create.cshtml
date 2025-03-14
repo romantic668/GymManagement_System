@@ -1,0 +1,36 @@
+<!-- Create.cshtml in GymManagement/Views/Book folder-->
+@model Book
+
+<div class="d-flex justify-content-center align-items-center">
+  <div class="login-container p-4 shadow rounded" style="width: 400px; background-color: #f8f9fa;">
+    <h2 class="text-center mb-4">Create Book</h2>
+
+    @if (ViewBag.Error != null)
+    {
+      <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post">
+      <div class="form-group mb-3 d-flex flex-column">
+        <label class="mb-1">Title:</label>
+        <input type="text" name="Title" class="form-control" required />
+      </div>
+      <div class="form-group mb-3 d-flex flex-column">
+        <label class="mb-1">AuthorId:</label>
+        <input type="text" name="AuthorId" class="form-control" required />
+      </div>
+      <div class="form-group mb-3 d-flex flex-column">
+        <label class="mb-1">LibraryBranchId:</label>
+        <input type="text" name="LibraryBranchId" class="form-control" required />
+      </div>
+      @* <div class="form-group mb-3 d-flex flex-column">
+        <label class="mb-1">Quantity:</label>
+        <input type="number" name="Quantity" class="form-control" required min="0" />
+      </div> *@
+      <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn custom-btn me-3">Submit</button>
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

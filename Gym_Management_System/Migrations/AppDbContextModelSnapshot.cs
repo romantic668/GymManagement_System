@@ -17,283 +17,483 @@ namespace GymManagement.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
 
-            modelBuilder.Entity("Author", b =>
+            modelBuilder.Entity("GymManagement.Models.Booking", b =>
                 {
-                    b.Property<int>("AuthorId")
+                    b.Property<int>("BookingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<DateTime>("BookingDate")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("AuthorId");
-
-                    b.ToTable("Authors");
-                });
-
-            modelBuilder.Entity("Book", b =>
-                {
-                    b.Property<int>("BookId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("CustomerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("LibraryBranchId")
+                    b.Property<int?>("ReceptionistId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("SessionId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("BookId");
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("AuthorId");
+                    b.HasKey("BookingId");
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("LibraryBranchId");
+                    b.HasIndex("ReceptionistId");
 
-                    b.ToTable("Books");
+                    b.HasIndex("SessionId");
+
+                    b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("BookInventory", b =>
+            modelBuilder.Entity("GymManagement.Models.GymBranch", b =>
                 {
-                    b.Property<int>("BookInventoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("LibraryBranchId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BookInventoryId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("LibraryBranchId");
-
-                    b.ToTable("BookInventories");
-                });
-
-            modelBuilder.Entity("BorrowedBook", b =>
-                {
-                    b.Property<int>("BorrowedBookId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("BorrowDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("LibraryBranchId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("BorrowedBookId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("LibraryBranchId");
-
-                    b.ToTable("BorrowedBooks");
-                });
-
-            modelBuilder.Entity("Customer", b =>
-                {
-                    b.Property<int>("CustomerId")
+                    b.Property<int>("BranchId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Age")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Email")
+                    b.Property<string>("BranchName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("ContactNumber")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.HasKey("BranchId");
 
-                    b.Property<DateTime>("RegisteredDate")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CustomerId");
-
-                    b.ToTable("Customers");
+                    b.ToTable("GymBranches");
                 });
 
-            modelBuilder.Entity("LibraryBranch", b =>
+            modelBuilder.Entity("GymManagement.Models.GymClass", b =>
                 {
-                    b.Property<int>("LibraryBranchId")
+                    b.Property<int>("GymClassId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Address")
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("AvailableTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("ClassName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OpeningHours")
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Phone")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Duration")
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("LibraryBranchId");
+                    b.Property<int>("TrainerId")
+                        .HasColumnType("INTEGER");
 
-                    b.ToTable("LibraryBranches");
+                    b.HasKey("GymClassId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("TrainerId");
+
+                    b.ToTable("GymClasses");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("GymManagement.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Room", b =>
+                {
+                    b.Property<int>("RoomId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GymBranchBranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RoomName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RoomId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("GymBranchBranchId");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Session", b =>
+                {
+                    b.Property<int>("SessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GymClassId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReceptionistId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SessionDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrainerId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("GymClassId");
+
+                    b.HasIndex("ReceptionistId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("TrainerId");
+
+                    b.ToTable("Sessions");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<DateTime>("JoinDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasDiscriminator().HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("Book", b =>
+            modelBuilder.Entity("GymManagement.Models.Admin", b =>
                 {
-                    b.HasOne("Author", "Author")
-                        .WithMany("Books")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("GymManagement.Models.User");
 
-                    b.HasOne("Customer", "Customer")
-                        .WithMany("BorrowedBooks")
+                    b.HasDiscriminator().HasValue("Admin");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Customer", b =>
+                {
+                    b.HasBaseType("GymManagement.Models.User");
+
+                    b.Property<string>("MembershipType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SubscriptionDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Customer");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Receptionist", b =>
+                {
+                    b.HasBaseType("GymManagement.Models.User");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GymBranchBranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Responsibilities")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("GymBranchBranchId");
+
+                    b.ToTable("Users", t =>
+                        {
+                            t.Property("BranchId")
+                                .HasColumnName("Receptionist_BranchId");
+
+                            t.Property("GymBranchBranchId")
+                                .HasColumnName("Receptionist_GymBranchBranchId");
+                        });
+
+                    b.HasDiscriminator().HasValue("Receptionist");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Trainer", b =>
+                {
+                    b.HasBaseType("GymManagement.Models.User");
+
+                    b.Property<int?>("AdminId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ExperienceStarted")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GymBranchBranchId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("GymBranchBranchId");
+
+                    b.HasDiscriminator().HasValue("Trainer");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Booking", b =>
+                {
+                    b.HasOne("GymManagement.Models.Customer", "Customer")
+                        .WithMany("Bookings")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("LibraryBranch", "LibraryBranch")
-                        .WithMany("Books")
-                        .HasForeignKey("LibraryBranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("GymManagement.Models.Receptionist", "Receptionist")
+                        .WithMany()
+                        .HasForeignKey("ReceptionistId");
 
-                    b.Navigation("Author");
+                    b.HasOne("GymManagement.Models.Session", "Session")
+                        .WithMany("Bookings")
+                        .HasForeignKey("SessionId");
 
                     b.Navigation("Customer");
 
-                    b.Navigation("LibraryBranch");
+                    b.Navigation("Receptionist");
+
+                    b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("BookInventory", b =>
+            modelBuilder.Entity("GymManagement.Models.GymClass", b =>
                 {
-                    b.HasOne("Book", "Book")
-                        .WithMany("BookInventories")
-                        .HasForeignKey("BookId")
+                    b.HasOne("GymManagement.Models.Admin", null)
+                        .WithMany("GymClasses")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("GymManagement.Models.Trainer", "Trainer")
+                        .WithMany("GymClasses")
+                        .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibraryBranch", "LibraryBranch")
-                        .WithMany("BookInventories")
-                        .HasForeignKey("LibraryBranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("LibraryBranch");
+                    b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("BorrowedBook", b =>
+            modelBuilder.Entity("GymManagement.Models.Payment", b =>
                 {
-                    b.HasOne("Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Customer", "Customer")
-                        .WithMany()
+                    b.HasOne("GymManagement.Models.Customer", "Customer")
+                        .WithMany("Payments")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibraryBranch", "LibraryBranch")
-                        .WithMany()
-                        .HasForeignKey("LibraryBranchId")
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Room", b =>
+                {
+                    b.HasOne("GymManagement.Models.Admin", null)
+                        .WithMany("Rooms")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
+                        .WithMany("Rooms")
+                        .HasForeignKey("GymBranchBranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Book");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("LibraryBranch");
+                    b.Navigation("GymBranch");
                 });
 
-            modelBuilder.Entity("Author", b =>
+            modelBuilder.Entity("GymManagement.Models.Session", b =>
                 {
-                    b.Navigation("Books");
+                    b.HasOne("GymManagement.Models.Admin", null)
+                        .WithMany("Sessions")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("GymManagement.Models.GymClass", "GymClass")
+                        .WithMany("Sessions")
+                        .HasForeignKey("GymClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymManagement.Models.Receptionist", "Receptionist")
+                        .WithMany()
+                        .HasForeignKey("ReceptionistId");
+
+                    b.HasOne("GymManagement.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymManagement.Models.Trainer", "Trainer")
+                        .WithMany("Sessions")
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GymClass");
+
+                    b.Navigation("Receptionist");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Trainer");
                 });
 
-            modelBuilder.Entity("Book", b =>
+            modelBuilder.Entity("GymManagement.Models.Receptionist", b =>
                 {
-                    b.Navigation("BookInventories");
+                    b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
+                        .WithMany("Receptionists")
+                        .HasForeignKey("GymBranchBranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GymBranch");
                 });
 
-            modelBuilder.Entity("Customer", b =>
+            modelBuilder.Entity("GymManagement.Models.Trainer", b =>
                 {
-                    b.Navigation("BorrowedBooks");
+                    b.HasOne("GymManagement.Models.Admin", null)
+                        .WithMany("Trainers")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
+                        .WithMany("Trainers")
+                        .HasForeignKey("GymBranchBranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GymBranch");
                 });
 
-            modelBuilder.Entity("LibraryBranch", b =>
+            modelBuilder.Entity("GymManagement.Models.GymBranch", b =>
                 {
-                    b.Navigation("BookInventories");
+                    b.Navigation("Receptionists");
 
-                    b.Navigation("Books");
+                    b.Navigation("Rooms");
+
+                    b.Navigation("Trainers");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.GymClass", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Session", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Admin", b =>
+                {
+                    b.Navigation("GymClasses");
+
+                    b.Navigation("Rooms");
+
+                    b.Navigation("Sessions");
+
+                    b.Navigation("Trainers");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Customer", b =>
+                {
+                    b.Navigation("Bookings");
+
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Trainer", b =>
+                {
+                    b.Navigation("GymClasses");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

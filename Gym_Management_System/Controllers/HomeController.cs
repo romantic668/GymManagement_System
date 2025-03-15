@@ -1,3 +1,4 @@
+// HomeController.cs
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using GymManagement.Models;
@@ -18,14 +19,14 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult Privacy()
+    public IActionResult ClassSchedule()
     {
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult MembershipOptions()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View();
     }
+
 }

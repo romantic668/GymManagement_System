@@ -1,14 +1,9 @@
 // Customer.cs
-public class Customer
+namespace GymManagement.Models;
+public class Customer : User
 {
-  public int CustomerId { get; set; }
-  public required string Name { get; set; }
-  public required string Email { get; set; }
-  public required string Phone { get; set; }
-  public int? Age { get; set; }
-  public string? Address { get; set; }
-  public DateTime RegisteredDate { get; set; } = DateTime.UtcNow;
-
-  // Relationship: one customer can borrow multiple books
-  public List<Book>? BorrowedBooks { get; set; }
+  public required string MembershipType { get; set; }
+  public required DateTime SubscriptionDate { get; set; }
+  public required ICollection<Booking> Bookings { get; set; }
+  public required ICollection<Payment> Payments { get; set; }
 }

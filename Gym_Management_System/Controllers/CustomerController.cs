@@ -42,7 +42,6 @@ namespace GymManagement.Controllers
     [ValidateAntiForgeryToken]
     public IActionResult Create(Customer customer)
     {
-      customer.CustomerId = 0;
       _dbContext.Customers.Add(customer);
       _dbContext.SaveChanges();
       return RedirectToAction("Details");
@@ -101,13 +100,7 @@ namespace GymManagement.Controllers
     [ValidateAntiForgeryToken]
     public IActionResult Edit(Customer customer)
     {
-      if (customer.CustomerId == 0)
-      {
-        ModelState.AddModelError("", "Invalid customer data.");
-        return View(customer);
-      }
-
-      var existingCustomer = _dbContext.Customers.FirstOrDefault(c => c.CustomerId == customer.CustomerId);
+      var existingCustomer = _dbContext.Customers.FirstOrDefault(c => c.Id == customer.Id);
       if (existingCustomer == null)
       {
         return NotFound("Customer not found.");
@@ -126,5 +119,6 @@ namespace GymManagement.Controllers
         return View(customer);
       }
     }
+
   }
 }

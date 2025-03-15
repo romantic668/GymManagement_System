@@ -17,11 +17,13 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GymManagement
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Gym
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-book" viewBox="0 0 16 16">
+                        class="bi bi-heart-pulse" viewBox="0 0 16 16">
                         <path
-                            d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783" />
+                            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053.918 3.995.78 5.323 1.508 7H.43c-2.128-5.697 4.165-8.83 7.394-5.857q.09.083.176.171a3 3 0 0 1 .176-.17c3.23-2.974 9.522.159 7.394 5.856h-1.078c.728-1.677.59-3.005.108-3.947C13.486.878 10.4.28 8.717 2.01zM2.212 10h1.315C4.593 11.183 6.05 12.458 8 13.795c1.949-1.337 3.407-2.612 4.473-3.795h1.315c-1.265 1.566-3.14 3.25-5.788 5-2.648-1.75-4.523-3.434-5.788-5" />
+                        <path
+                            d="M10.464 3.314a.5.5 0 0 0-.945.049L7.921 8.956 6.464 5.314a.5.5 0 0 0-.88-.091L3.732 8H.5a.5.5 0 0 0 0 1H4a.5.5 0 0 0 .416-.223l1.473-2.209 1.647 4.118a.5.5 0 0 0 .945-.049l1.598-5.593 1.457 3.642A.5.5 0 0 0 12 9h3.5a.5.5 0 0 0 0-1h-3.162z" />
                     </svg>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
@@ -35,21 +37,65 @@
                                 asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Book") ? "active" : "")"
-                                asp-controller="Book" asp-action="Details">Book</a>
+                            <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/GymBranch/Details") ? "active" : "")"
+                                asp-controller="GymBranch" asp-action="Index">Gym Branches</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Author") ? "active" : "")"
-                                asp-controller="Author" asp-action="Details">Author</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Customer") ? "active" : "")"
-                                asp-controller="Customer" asp-action="Details">Customer</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/LibraryBranch") ? "active" : "")"
-                                asp-controller="LibraryBranch" asp-action="Details">Branch</a>
-                        </li>
+                        <!-- Admin -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Admin/ManageGymBranches") ? "active" : "")"
+                                    asp-controller="Admin" asp-action="ManageGymBranches">Manage Gym Branches</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Admin/ManageMembers") ? "active" : "")"
+                                    asp-controller="Admin" asp-action="ManageMembers">Manage Members</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Admin/ManageSessions") ? "active" : "")"
+                                    asp-controller="Admin" asp-action="ManageSessions">Manage Sessions</a>
+                            </li>
+                        }
+                        <!-- Trainer -->
+                        @if (User.IsInRole("Trainer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Trainer/Dashboard") ? "active" : "")"
+                                    asp-controller="Trainer" asp-action="Dashboard">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Trainer/ViewSessions") ? "active" : "")"
+                                    asp-controller="Trainer" asp-action="ViewSessions">View Sessions</a>
+                            </li>
+                        }
+                        <!-- Receptionist -->
+                        @if (User.IsInRole("Receptionist"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Receptionist/ManageBookings") ? "active" : "")"
+                                    asp-controller="Receptionist" asp-action="ManageBookings">Manage Bookings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Receptionist/CheckIn") ? "active" : "")"
+                                    asp-controller="Receptionist" asp-action="CheckIn">Check In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Receptionist/ViewCustomers") ? "active" : "")"
+                                    asp-controller="Receptionist" asp-action="ViewCustomers">View Customers</a>
+                            </li>
+                        }
+                        <!-- Customer -->
+                        @if (User.IsInRole("Customer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/Customer/Profile") ? "active" : "")"
+                                    asp-controller="Customer" asp-action="Profile">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark @(Context.Request.Path.StartsWithSegments("/ClassSchedule/Index") ? "active" : "")"
+                                    asp-controller="ClassSchedule" asp-action="Index">Class Schedule</a>
+                            </li>
+                        }
                     </ul>
 
                     <ul class="navbar-nav">

@@ -13,17 +13,30 @@ namespace GymManagement.Data
       _configuration = configuration;
     }
 
-    public DbSet<Book> Books { get; set; }
-    public DbSet<Author> Authors { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<GymBranch> GymBranches { get; set; }
+    public DbSet<GymClass> GymClasses { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Receptionist> Receptionists { get; set; }
+    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Session> Sessions { get; set; }
+    public DbSet<Trainer> Trainers { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<LibraryBranch> LibraryBranches { get; set; }
-    public DbSet<BookInventory> BookInventories { get; set; }
-    public DbSet<BorrowedBook> BorrowedBooks { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
       optionsBuilder.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      base.OnModelCreating(modelBuilder);
+
+      modelBuilder.Entity<GymBranch>()
+          .HasKey(g => g.BranchId);
+    }
+
   }
 }

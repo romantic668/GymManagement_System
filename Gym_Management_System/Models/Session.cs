@@ -9,7 +9,7 @@ public class Session
   public required GymClass GymClass { get; set; }
   public required int RoomId { get; set; } // fk
   public required Room Room { get; set; }
-  public required int TrainerId { get; set; }  // fk
+  public required int TrainerId { get; set; } = 1;// fk
   public required Trainer Trainer { get; set; }
   public required ICollection<Booking> Bookings { get; set; }
   public int? ReceptionistId { get; set; }

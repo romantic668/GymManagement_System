@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace GymManagement.Migrations
 {
     /// <inheritdoc />
@@ -58,14 +60,12 @@ namespace GymManagement.Migrations
                         name: "FK_Users_GymBranches_GymBranchBranchId",
                         column: x => x.GymBranchBranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "BranchId");
                     table.ForeignKey(
                         name: "FK_Users_GymBranches_Receptionist_GymBranchBranchId",
                         column: x => x.Receptionist_GymBranchBranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "BranchId");
                     table.ForeignKey(
                         name: "FK_Users_Users_AdminId",
                         column: x => x.AdminId,
@@ -134,8 +134,8 @@ namespace GymManagement.Migrations
                     Capacity = table.Column<int>(type: "INTEGER", nullable: false),
                     IsAvailable = table.Column<bool>(type: "INTEGER", nullable: false),
                     BranchId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GymBranchBranchId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AdminId = table.Column<int>(type: "INTEGER", nullable: true)
+                    AdminId = table.Column<int>(type: "INTEGER", nullable: true),
+                    GymBranchBranchId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -144,8 +144,7 @@ namespace GymManagement.Migrations
                         name: "FK_Rooms_GymBranches_GymBranchBranchId",
                         column: x => x.GymBranchBranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "BranchId");
                     table.ForeignKey(
                         name: "FK_Rooms_Users_AdminId",
                         column: x => x.AdminId,
@@ -232,6 +231,49 @@ namespace GymManagement.Migrations
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.InsertData(
+                table: "GymBranches",
+                columns: new[] { "BranchId", "Address", "BranchName", "ContactNumber" },
+                values: new object[,]
+                {
+                    { 1, "123 Main St", "Downtown Gym", "123-456-7890" },
+                    { 2, "456 High St", "Uptown Gym", "987-654-3210" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "RoomId", "AdminId", "BranchId", "Capacity", "GymBranchBranchId", "IsAvailable", "RoomName" },
+                values: new object[,]
+                {
+                    { 1, null, 1, 20, null, true, "Yoga Room" },
+                    { 2, null, 2, 30, null, true, "Weightlifting Room" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Discriminator", "Email", "JoinDate", "Name", "Password", "Role" },
+                values: new object[] { 1, "User", "admin@example.com", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Admin User", "Admin@123", 0 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Discriminator", "Email", "JoinDate", "MembershipType", "Name", "Password", "Role", "SubscriptionDate" },
+                values: new object[] { 2, "Customer", "jane@example.com", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Premium", "Jane Doe", "Customer@123", 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "AdminId", "BranchId", "Discriminator", "Email", "ExperienceStarted", "GymBranchBranchId", "JoinDate", "Name", "Password", "Role", "Specialization" },
+                values: new object[] { 3, null, 1, "Trainer", "johntrainer@example.com", new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "John Trainer", "Trainer@123", 2, "Yoga" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Receptionist_BranchId", "Discriminator", "Email", "Receptionist_GymBranchBranchId", "IsAvailable", "JoinDate", "Name", "Notes", "Password", "Responsibilities", "Role" },
+                values: new object[] { 4, 1, "Receptionist", "mike@example.com", null, true, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Mike Receptionist", null, "Receptionist@123", "Front Desk Management", 1 });
+
+            migrationBuilder.InsertData(
+                table: "GymClasses",
+                columns: new[] { "GymClassId", "AdminId", "AvailableTime", "ClassName", "Description", "Duration", "TrainerId" },
+                values: new object[] { 1, null, new DateTime(2025, 3, 15, 10, 0, 0, 0, DateTimeKind.Unspecified), "Beginner Yoga", null, 60, 3 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_CustomerId",

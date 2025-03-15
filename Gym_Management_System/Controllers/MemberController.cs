@@ -28,8 +28,8 @@ public class MemberController : Controller
 
     var customer = _dbContext.Customers
         .Include(c => c.Bookings)
-            .ThenInclude(b => b.Session)
-                .ThenInclude(s => s.GymClass)
+        .ThenInclude(b => b.Session)
+        .ThenInclude(s => s.GymClass)
         .Include(c => c.Payments)
         .FirstOrDefault(c => c.Id == userId);
 
@@ -136,6 +136,7 @@ public class MemberController : Controller
         .Where(b => b.CustomerId == userId && b.Status == BookingStatus.CheckedIn)
         .OrderByDescending(b => b.BookingDate)
         .ToList();
+
 
     return View(workoutHistory);
   }

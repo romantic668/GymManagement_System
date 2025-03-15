@@ -34,9 +34,132 @@ namespace GymManagement.Data
     {
       base.OnModelCreating(modelBuilder);
 
-      modelBuilder.Entity<GymBranch>()
-          .HasKey(g => g.BranchId);
-    }
+      modelBuilder.Entity<GymBranch>().HasKey(g => g.BranchId);
 
+      modelBuilder.Entity<GymBranch>().HasData(
+           new GymBranch
+           {
+             BranchId = 1,
+             BranchName = "Downtown Gym",
+             Address = "123 Main St",
+             ContactNumber = "123-456-7890",
+             Trainers = new List<Trainer>(),
+             Receptionists = new List<Receptionist>(),
+             Rooms = new List<Room>()
+           },
+           new GymBranch
+           {
+             BranchId = 2,
+             BranchName = "Uptown Gym",
+             Address = "456 High St",
+             ContactNumber = "987-654-3210",
+             Trainers = new List<Trainer>(),
+             Receptionists = new List<Receptionist>(),
+             Rooms = new List<Room>()
+           }
+       );
+
+      //  User (Admin)
+      modelBuilder.Entity<User>().HasData(
+          new User
+          {
+            Id = 1,
+            Name = "Admin User",
+            Email = "admin@example.com",
+            Password = "Admin@123", //
+            Role = Role.Admin,
+            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+          }
+      );
+
+      //  Customer
+      modelBuilder.Entity<Customer>().HasData(
+          new Customer
+          {
+            Id = 2,
+            Name = "Jane Doe",
+            Email = "jane@example.com",
+            Password = "Customer@123",
+            Role = Role.Customer,
+            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            SubscriptionDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            MembershipType = "Premium",
+            Bookings = new List<Booking>(),
+            Payments = new List<Payment>()
+          }
+      );
+
+      //  Trainer
+      modelBuilder.Entity<Trainer>().HasData(
+          new Trainer
+          {
+            Id = 3,
+            Name = "John Trainer",
+            Email = "johntrainer@example.com",
+            Password = "Trainer@123",
+            Role = Role.Trainer,
+            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            Specialization = "Yoga",
+            ExperienceStarted = new DateTime(2015, 1, 1),
+            BranchId = 1,
+            GymBranch = null,
+            GymClasses = new List<GymClass>(),
+            Sessions = new List<Session>()
+          }
+      );
+
+      //  Receptionist
+      modelBuilder.Entity<Receptionist>().HasData(
+          new Receptionist
+          {
+            Id = 4,
+            Name = "Mike Receptionist",
+            Email = "mike@example.com",
+            Password = "Receptionist@123",
+            Role = Role.Receptionist,
+            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            BranchId = 1,
+            IsAvailable = true,
+            Responsibilities = "Front Desk Management",
+            GymBranch = null
+          }
+      );
+
+      //  Rooms
+      modelBuilder.Entity<Room>().HasData(
+          new Room
+          {
+            RoomId = 1,
+            RoomName = "Yoga Room",
+            Capacity = 20,
+            IsAvailable = true,
+            BranchId = 1,
+          },
+          new Room
+          {
+            RoomId = 2,
+            RoomName = "Weightlifting Room",
+            Capacity = 30,
+            IsAvailable = true,
+            BranchId = 2,
+          }
+      );
+
+      //  Gym Classes
+      modelBuilder.Entity<GymClass>().HasData(
+          new GymClass
+          {
+            GymClassId = 1,
+            ClassName = "Beginner Yoga",
+            AvailableTime = new DateTime(2025, 3, 15, 10, 0, 0),
+            Duration = 60,
+            TrainerId = 3,
+            Trainer = null,
+            Sessions = new List<Session>()
+          }
+      );
+    }
   }
+
+
 }

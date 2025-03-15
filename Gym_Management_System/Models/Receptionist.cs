@@ -6,5 +6,5 @@ public class Receptionist : User
   public string? Notes { get; set; }
   public required bool IsAvailable { get; set; }
   public required int BranchId { get; set; }
-  public required GymBranch GymBranch { get; set; }
+  public GymBranch? GymBranch { get; set; }
 }

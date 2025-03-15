@@ -1,0 +1,39 @@
+/* _content/GymManagement/Views/Shared/_Layout.cshtml.rz.scp.css */
+/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand[b-fia5gb99vz] {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a[b-fia5gb99vz] {
+  color: #0077cc;
+}
+
+.btn-primary[b-fia5gb99vz] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active[b-fia5gb99vz], .nav-pills .show > .nav-link[b-fia5gb99vz] {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-bottom[b-fia5gb99vz] {
+  border-bottom: 1px solid #e5e5e5;
+} 
+.box-shadow[b-fia5gb99vz] {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.footer-box[b-fia5gb99vz]{
+  white-space: nowrap;
+  line-height: 60px;
+  margin: 1rem 0;
+  
+}

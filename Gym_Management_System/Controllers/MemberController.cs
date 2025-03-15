@@ -33,6 +33,11 @@ public class MemberController : Controller
         .Include(c => c.Payments)
         .FirstOrDefault(c => c.Id == userId);
 
+    if (customer == null)
+    {
+      return NotFound("Customer not found."); // 表示数据库里没有这条记录
+    }
+
     if (customer?.Name == null)
     {
       return NotFound("Customer not found.");

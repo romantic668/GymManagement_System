@@ -120,8 +120,8 @@ public class TrainerController : Controller
     var model = new EditTrainerProfileViewModel
     {
       TrainerId = trainer.Id,
-      Name = trainer.Name,
-      Email = trainer.Email,
+      Name = trainer.Name ?? "Unknown",
+      Email = trainer.Email ?? "No Email Provided",
       Specialization = trainer.Specialization,
       ExperienceStarted = trainer.ExperienceStarted
     };
@@ -148,7 +148,8 @@ public class TrainerController : Controller
 
     trainer.Name = model.Name;
     trainer.Email = model.Email;
-    trainer.Specialization = model.Specialization;
+    trainer.Specialization = model.Specialization ?? "General";
+
 
     _dbContext.SaveChanges();
     return RedirectToAction("Dashboard");

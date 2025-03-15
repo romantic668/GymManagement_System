@@ -112,7 +112,7 @@ public class AccountController : Controller
     var model = new EditProfileViewModel
     {
       Name = user.Name,
-      Email = user.Email
+      Email = user.Email ?? "No Email"
     };
 
     return View(model);
@@ -150,7 +150,7 @@ public class AccountController : Controller
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Email, user.Email ?? "No Email Provided"),
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 

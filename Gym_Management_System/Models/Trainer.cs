@@ -1,11 +1,20 @@
-// Trainer.cs
-namespace GymManagement.Models;
-public class Trainer : User
+using System.ComponentModel.DataAnnotations;
+using GymManagement.Models;
+
+namespace GymManagement.Models
 {
-  public required string Specialization { get; set; }
-  public required DateTime ExperienceStarted { get; set; }
-  public required int BranchId { get; set; }
-  public GymBranch? GymBranch { get; set; }
-  public required ICollection<GymClass> GymClasses { get; set; } // 1 Trainer teaches multiple GymClasses
-  public required ICollection<Session> Sessions { get; set; } // One Trainer teaches multiple Sessions
+  public class Trainer : User
+  {
+    [Required]
+    public string Specialization { get; set; } = "";
+
+    [Required]
+    [Display(Name = "Experience Start Date")]
+    public DateTime ExperienceStarted { get; set; }
+
+    public int BranchId { get; set; }
+    public GymBranch? GymBranch { get; set; }
+    public ICollection<GymClass> GymClasses { get; set; } = new List<GymClass>();
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
+  }
 }

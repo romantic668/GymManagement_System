@@ -1,16 +1,26 @@
-// Customer.cs
-namespace GymManagement.Models;
-public class Customer : User
+using System.ComponentModel.DataAnnotations;
+
+namespace GymManagement.Models
 {
-  public required string MembershipType { get; set; }
-  public required DateTime SubscriptionDate { get; set; }
-  public required ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-
-  public required ICollection<Payment> Payments { get; set; } = new List<Payment>();
-
-  //  Add a default constructor (EF Core needs it)
-  public Customer()
+  public class Customer : User
   {
-    SubscriptionDate = DateTime.UtcNow;  // Default to current date
+    [Required]
+    [StringLength(50)]
+    public string MembershipType { get; set; } = string.Empty;
+
+    [Required]
+    public DateTime SubscriptionDate { get; set; }
+
+    [Required]
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+    [Required]
+    public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    // EF Core requires a parameterless constructor
+    public Customer()
+    {
+      SubscriptionDate = DateTime.UtcNow;  // Set default if not specified
+    }
   }
 }

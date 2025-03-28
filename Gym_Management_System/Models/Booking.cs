@@ -1,25 +1,48 @@
-// Booking.cs
-namespace GymManagement.Models;
-public class Booking
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GymManagement.Models
 {
-  public int BookingId { get; set; }
-  public required DateTime BookingDate { get; set; }
-  public required BookingStatus Status { get; set; }  // Pending, Confirmed, Canceled）
-  public int CustomerId { get; set; }  // 确保 FK 不能为空
-  public Customer Customer { get; set; } = null!;
+  public class Booking
+  {
+    [Key]
+    public int BookingId { get; set; }
 
-  public int SessionId { get; set; }  // FK 不能为空
-  public Session Session { get; set; } = null!;
-  public DateTime? CheckInTime { get; set; }  // Check-in time (if checked-in)
+    [Required]
+    public DateTime BookingDate { get; set; }
 
-  public int? ReceptionistId { get; set; }  // The receptionist who handles the check-in (optional)
-  public Receptionist? Receptionist { get; set; }
+    [Required]
+    public BookingStatus Status { get; set; }
 
-}
-public enum BookingStatus
-{
-  Pending,
-  Confirmed,
-  Canceled,
-  CheckedIn
+    // 🔹 Foreign key to Customer (IdentityUser-based)
+    [Required]
+    public string CustomerId { get; set; } = string.Empty;
+
+    [ForeignKey("CustomerId")]
+    public Customer Customer { get; set; } = null!;
+
+    // 🔹 Foreign key to Session
+    [Required]
+    public int SessionId { get; set; }
+
+    [ForeignKey("SessionId")]
+    public Session Session { get; set; } = null!;
+
+    // 🔹 Optional check-in time
+    public DateTime? CheckInTime { get; set; }
+
+    // 🔹 Optional foreign key to Receptionist
+    public string? ReceptionistId { get; set; }
+
+    [ForeignKey("ReceptionistId")]
+    public Receptionist? Receptionist { get; set; }
+  }
+
+  public enum BookingStatus
+  {
+    Pending,
+    Confirmed,
+    Canceled,
+    CheckedIn
+  }
 }

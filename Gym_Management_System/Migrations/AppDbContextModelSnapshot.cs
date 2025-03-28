@@ -29,11 +29,12 @@ namespace GymManagement.Migrations
                     b.Property<DateTime?>("CheckInTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("ReceptionistId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("ReceptionistId")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("SessionId")
                         .HasColumnType("INTEGER");
@@ -59,13 +60,16 @@ namespace GymManagement.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BranchName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ContactNumber")
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("BranchId");
@@ -95,42 +99,30 @@ namespace GymManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("AvailableTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClassName")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Duration")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TrainerId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("TrainerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("GymClassId");
-
-                    b.HasIndex("AdminId");
 
                     b.HasIndex("TrainerId");
 
                     b.ToTable("GymClasses");
-
-                    b.HasData(
-                        new
-                        {
-                            GymClassId = 1,
-                            AvailableTime = new DateTime(2025, 3, 15, 10, 0, 0, 0, DateTimeKind.Unspecified),
-                            ClassName = "Beginner Yoga",
-                            Duration = 60,
-                            TrainerId = 3
-                        });
                 });
 
             modelBuilder.Entity("GymManagement.Models.Payment", b =>
@@ -139,14 +131,16 @@ namespace GymManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
@@ -165,9 +159,6 @@ namespace GymManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
 
@@ -181,11 +172,11 @@ namespace GymManagement.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("RoomName")
+                        .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("RoomId");
-
-                    b.HasIndex("AdminId");
 
                     b.HasIndex("GymBranchBranchId");
 
@@ -216,17 +207,14 @@ namespace GymManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Capacity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GymClassId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ReceptionistId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("ReceptionistId")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("INTEGER");
@@ -234,12 +222,11 @@ namespace GymManagement.Migrations
                     b.Property<DateTime>("SessionDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TrainerId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("TrainerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("SessionId");
-
-                    b.HasIndex("AdminId");
 
                     b.HasIndex("GymClassId");
 
@@ -254,9 +241,15 @@ namespace GymManagement.Migrations
 
             modelBuilder.Entity("GymManagement.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -264,47 +257,194 @@ namespace GymManagement.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("JoinDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Role")
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("GymManagement.Models.Admin", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.HasBaseType("GymManagement.Models.User");
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
 
-                    b.HasDiscriminator().HasValue("Admin");
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@example.com",
-                            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Admin User",
-                            Password = "Admin@123",
-                            Role = 0
-                        });
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("GymManagement.Models.Customer", b =>
@@ -313,25 +453,13 @@ namespace GymManagement.Migrations
 
                     b.Property<string>("MembershipType")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("SubscriptionDate")
                         .HasColumnType("TEXT");
 
                     b.HasDiscriminator().HasValue("Customer");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 2,
-                            Email = "jane@example.com",
-                            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Jane Doe",
-                            Password = "Customer@123",
-                            Role = 3,
-                            MembershipType = "Premium",
-                            SubscriptionDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("GymManagement.Models.Receptionist", b =>
@@ -348,15 +476,17 @@ namespace GymManagement.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Responsibilities")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasIndex("GymBranchBranchId");
 
-                    b.ToTable("Users", t =>
+                    b.ToTable("AspNetUsers", t =>
                         {
                             t.Property("BranchId")
                                 .HasColumnName("Receptionist_BranchId");
@@ -366,28 +496,11 @@ namespace GymManagement.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("Receptionist");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 4,
-                            Email = "mike@example.com",
-                            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Mike Receptionist",
-                            Password = "Receptionist@123",
-                            Role = 1,
-                            BranchId = 1,
-                            IsAvailable = true,
-                            Responsibilities = "Front Desk Management"
-                        });
                 });
 
             modelBuilder.Entity("GymManagement.Models.Trainer", b =>
                 {
                     b.HasBaseType("GymManagement.Models.User");
-
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
@@ -402,25 +515,9 @@ namespace GymManagement.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasIndex("AdminId");
-
                     b.HasIndex("GymBranchBranchId");
 
                     b.HasDiscriminator().HasValue("Trainer");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 3,
-                            Email = "johntrainer@example.com",
-                            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "John Trainer",
-                            Password = "Trainer@123",
-                            Role = 2,
-                            BranchId = 1,
-                            ExperienceStarted = new DateTime(2015, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Specialization = "Yoga"
-                        });
                 });
 
             modelBuilder.Entity("GymManagement.Models.Booking", b =>
@@ -450,10 +547,6 @@ namespace GymManagement.Migrations
 
             modelBuilder.Entity("GymManagement.Models.GymClass", b =>
                 {
-                    b.HasOne("GymManagement.Models.Admin", null)
-                        .WithMany("GymClasses")
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("GymManagement.Models.Trainer", "Trainer")
                         .WithMany("GymClasses")
                         .HasForeignKey("TrainerId")
@@ -476,10 +569,6 @@ namespace GymManagement.Migrations
 
             modelBuilder.Entity("GymManagement.Models.Room", b =>
                 {
-                    b.HasOne("GymManagement.Models.Admin", null)
-                        .WithMany("Rooms")
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
                         .WithMany("Rooms")
                         .HasForeignKey("GymBranchBranchId");
@@ -489,10 +578,6 @@ namespace GymManagement.Migrations
 
             modelBuilder.Entity("GymManagement.Models.Session", b =>
                 {
-                    b.HasOne("GymManagement.Models.Admin", null)
-                        .WithMany("Sessions")
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("GymManagement.Models.GymClass", "GymClass")
                         .WithMany("Sessions")
                         .HasForeignKey("GymClassId")
@@ -524,6 +609,57 @@ namespace GymManagement.Migrations
                     b.Navigation("Trainer");
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("GymManagement.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("GymManagement.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymManagement.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("GymManagement.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GymManagement.Models.Receptionist", b =>
                 {
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
@@ -535,10 +671,6 @@ namespace GymManagement.Migrations
 
             modelBuilder.Entity("GymManagement.Models.Trainer", b =>
                 {
-                    b.HasOne("GymManagement.Models.Admin", null)
-                        .WithMany("Trainers")
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
                         .WithMany("Trainers")
                         .HasForeignKey("GymBranchBranchId");
@@ -563,17 +695,6 @@ namespace GymManagement.Migrations
             modelBuilder.Entity("GymManagement.Models.Session", b =>
                 {
                     b.Navigation("Bookings");
-                });
-
-            modelBuilder.Entity("GymManagement.Models.Admin", b =>
-                {
-                    b.Navigation("GymClasses");
-
-                    b.Navigation("Rooms");
-
-                    b.Navigation("Sessions");
-
-                    b.Navigation("Trainers");
                 });
 
             modelBuilder.Entity("GymManagement.Models.Customer", b =>

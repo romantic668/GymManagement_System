@@ -1,17 +1,48 @@
-// Session.cs
-namespace GymManagement.Models;
-public class Session
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GymManagement.Models
 {
-  public required int SessionId { get; set; }
-  public required DateTime SessionDateTime { get; set; }
-  public required int Capacity { get; set; }
-  public required int GymClassId { get; set; } // fk
-  public required GymClass GymClass { get; set; }
-  public required int RoomId { get; set; } // fk
-  public required Room Room { get; set; }
-  public required int TrainerId { get; set; } = 1;// fk
-  public required Trainer Trainer { get; set; }
-  public required ICollection<Booking> Bookings { get; set; }
-  public int? ReceptionistId { get; set; }
-  public Receptionist? Receptionist { get; set; }
+  public class Session
+  {
+    [Key]
+    public int SessionId { get; set; }
+
+    [Required]
+    public DateTime SessionDateTime { get; set; }
+
+    [Required]
+    public int Capacity { get; set; }
+
+    // 🔸 GymClass FK
+    [Required]
+    public int GymClassId { get; set; }
+
+    [ForeignKey("GymClassId")]
+    public GymClass GymClass { get; set; } = null!;
+
+    // 🔸 Room FK
+    [Required]
+    public int RoomId { get; set; }
+
+    [ForeignKey("RoomId")]
+    public Room Room { get; set; } = null!;
+
+    // 🔸 Trainer FK (string type from IdentityUser)
+    [Required]
+    public string TrainerId { get; set; } = string.Empty;
+
+    [ForeignKey("TrainerId")]
+    public Trainer Trainer { get; set; } = null!;
+
+    // 🔸 Bookings
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+    // 🔸 Optional Receptionist FK
+    public string? ReceptionistId { get; set; }
+
+    [ForeignKey("ReceptionistId")]
+    public Receptionist? Receptionist { get; set; }
+  }
 }
+

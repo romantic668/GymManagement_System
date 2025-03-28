@@ -1,4 +1,3 @@
-// MemberController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +5,7 @@ using GymManagement.Data;
 using GymManagement.Models;
 using System.Security.Claims;
 
-[Authorize(Roles = "Customer")]  // 仅允许会员访问
+[Authorize(Roles = "Customer")] // Only allow access to Customers
 public class MemberController : Controller
 {
   private readonly AppDbContext _dbContext;
@@ -16,29 +15,23 @@ public class MemberController : Controller
     _dbContext = dbContext;
   }
 
-  // 🔹 会员仪表盘
+  // 🔹 Member Dashboard
   public IActionResult Dashboard()
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
 
     var customer = _dbContext.Customers
         .Include(c => c.Bookings)
-        .ThenInclude(b => b.Session)
-        .ThenInclude(s => s.GymClass)
+            .ThenInclude(b => b.Session)
+                .ThenInclude(s => s.GymClass)
         .Include(c => c.Payments)
         .FirstOrDefault(c => c.Id == userId);
 
-    if (customer == null)
-    {
-      return NotFound("Customer not found."); // 表示数据库里没有这条记录
-    }
-
-    if (customer?.Name == null)
+    if (customer == null || customer.Name == null)
     {
       return NotFound("Customer not found.");
     }
@@ -46,27 +39,26 @@ public class MemberController : Controller
     return View(customer);
   }
 
-  // 🔹 预约健身课程
+  // 🔹 Book a Gym Session
   [HttpPost]
   public IActionResult BookSession(int sessionId)
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
+
     var session = _dbContext.Sessions.Find(sessionId);
     if (session == null)
     {
       return NotFound("Session not found.");
     }
 
-    // 检查是否已经预约
     bool alreadyBooked = _dbContext.Bookings.Any(b => b.CustomerId == userId && b.SessionId == sessionId);
     if (alreadyBooked)
     {
-      ViewBag.Error = "You have already booked this session.";
+      TempData["Error"] = "You have already booked this session.";
       return RedirectToAction("Dashboard");
     }
 
@@ -84,15 +76,16 @@ public class MemberController : Controller
     return RedirectToAction("Dashboard");
   }
 
+  // 🔹 Cancel a Booking
   [HttpPost]
   public IActionResult CancelBooking(int bookingId)
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
+
     var booking = _dbContext.Bookings.FirstOrDefault(b => b.BookingId == bookingId && b.CustomerId == userId);
     if (booking == null)
     {
@@ -105,18 +98,16 @@ public class MemberController : Controller
     return RedirectToAction("Dashboard");
   }
 
-
-  // 🔹 会员状态
+  // 🔹 Membership Status
   public IActionResult MembershipStatus()
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
-    var customer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
 
+    var customer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
     if (customer == null)
     {
       return NotFound("Customer not found.");
@@ -125,12 +116,11 @@ public class MemberController : Controller
     return View(customer);
   }
 
-  // 🔹 健身记录
+  // 🔹 Workout History
   public IActionResult WorkoutHistory()
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
@@ -142,21 +132,19 @@ public class MemberController : Controller
         .OrderByDescending(b => b.BookingDate)
         .ToList();
 
-
     return View(workoutHistory);
   }
 
-  // 🔹 查看个人信息
+  // 🔹 View Profile
   public IActionResult Profile()
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
-    var customer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
 
+    var customer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
     if (customer == null)
     {
       return NotFound("Customer not found.");
@@ -165,18 +153,17 @@ public class MemberController : Controller
     return View(customer);
   }
 
-  // 🔹 修改个人信息
+  // 🔹 Edit Profile
   [HttpPost]
   public IActionResult EditProfile(Customer updatedCustomer)
   {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userId))
     {
       return BadRequest("Invalid user identifier.");
     }
-    var existingCustomer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
 
+    var existingCustomer = _dbContext.Customers.FirstOrDefault(c => c.Id == userId);
     if (existingCustomer == null)
     {
       return NotFound("Customer not found.");

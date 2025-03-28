@@ -1,203 +1,208 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using GymManagement.Data;
 using GymManagement.Models;
+using GymManagement.ViewModels;
+using System.Security.Claims;
 
-public class AccountController : Controller
+namespace GymManagement.Controllers
 {
-  private readonly AppDbContext _dbContext;
-
-  public AccountController(AppDbContext dbContext)
+  public class AccountController : Controller
   {
-    _dbContext = dbContext;
-  }
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
 
-  // 🔹 GET: 注册页面
-  [HttpGet]
-  public IActionResult Register()
-  {
-    return View();
-  }
-
-  // 🔹 POST: 处理注册请求
-  [HttpPost]
-  [ValidateAntiForgeryToken]
-  public async Task<IActionResult> Register(string name, string email, string password)
-  {
-    if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
     {
-      ViewBag.Error = "Name, email, and password cannot be empty.";
-      return View();
+      _userManager = userManager;
+      _signInManager = signInManager;
     }
 
-    if (_dbContext.Users.Any(u => u.Email == email))
+    // 🔹 Display Register page
+    [HttpGet]
+    public IActionResult Register() => View();
+
+    // 🔹 Handle Register POST
+    [HttpPost]
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
-      ViewBag.Error = "Email is already taken.";
-      return View();
-    }
-
-    string passwordHash = HashPassword(password);
-
-    var newUser = new User
-    {
-      Name = name,
-      Email = email,
-      Password = passwordHash,
-      Role = Role.Customer, // 默认注册为会员
-      JoinDate = DateTime.UtcNow
-    };
-
-    _dbContext.Users.Add(newUser);
-    await _dbContext.SaveChangesAsync();
-
-    await SignInUser(newUser);
-
-    return RedirectToDashboard(newUser.Role);
-  }
-
-  // 🔹 GET: 登录页面
-  [HttpGet]
-  public IActionResult Login()
-  {
-    return View();
-  }
-
-  // 🔹 POST: 处理登录请求
-  [HttpPost]
-  [ValidateAntiForgeryToken]
-  public async Task<IActionResult> Login(string email, string password)
-  {
-    var user = _dbContext.Users.AsNoTracking().FirstOrDefault(u => u.Email == email);
-
-    if (user == null || !VerifyPassword(password, user.Password))
-    {
-      ViewBag.Error = "Invalid email or password.";
-      return View();
-    }
-
-    await SignInUser(user);
-
-    return RedirectToDashboard(user.Role);
-  }
-
-  // 🔹 POST: 退出登录
-  [HttpPost]
-  public async Task<IActionResult> Logout()
-  {
-    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-    return RedirectToAction("Login");
-  }
-
-  // 🔹 GET: 查看 & 修改个人信息
-  [HttpGet]
-  public IActionResult EditProfile()
-  {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
-    {
-      return BadRequest("Invalid user identifier.");
-    }
-    var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
-
-    if (user == null)
-    {
-      return NotFound("User not found.");
-    }
-
-    var model = new EditProfileViewModel
-    {
-      Name = user.Name,
-      Email = user.Email ?? "No Email"
-    };
-
-    return View(model);
-  }
-
-  // 🔹 POST: 处理修改个人信息请求
-  [HttpPost]
-  [ValidateAntiForgeryToken]
-  public IActionResult EditProfile(EditProfileViewModel model)
-  {
-    int userId;
-    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(userIdClaim, out userId))
-    {
-      return BadRequest("Invalid user identifier.");
-    }
-    var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
-
-    if (user == null)
-    {
-      return NotFound("User not found.");
-    }
-
-    user.Name = model.Name;
-    user.Email = model.Email;
-
-    _dbContext.SaveChanges();
-    return RedirectToAction("EditProfile");
-  }
-
-  // 🔹 处理用户登录逻辑
-  private async Task SignInUser(User user)
-  {
-    var claims = new List<Claim>
+      if (ModelState.IsValid)
+      {
+        // 🔸 Check if username already exists
+        var existingUserByUsername = await _userManager.FindByNameAsync(model.Username);
+        if (existingUserByUsername != null)
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.Email, user.Email ?? "No Email Provided"),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
+          ModelState.AddModelError("Username", "This username is already taken.");
+          return View(model);
+        }
+
+        // 🔸 Check if email already exists
+        var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+        if (existingUserByEmail != null)
+        {
+          ModelState.AddModelError("Email", "This email is already registered.");
+          return View(model);
+        }
+
+        // 🔸 Create new user
+        var user = new User
+        {
+          UserName = model.Username,
+          Email = model.Email,
+          Name = model.Name,
+          JoinDate = DateTime.UtcNow
         };
 
-    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-    var authProperties = new AuthenticationProperties { IsPersistent = true };
+        // 🔸 Save to Identity database
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+          // 🔸 Assign default role
+          await _userManager.AddToRoleAsync(user, "Customer");
+          await _signInManager.SignInAsync(user, isPersistent: false);
+          return RedirectToAction("Index", "Home");
+        }
 
-    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-  }
+        // 🔸 Show identity creation errors
+        foreach (var error in result.Errors)
+          ModelState.AddModelError("", error.Description);
+      }
 
-  // 🔹 根据角色跳转到对应的 Dashboard
-  private IActionResult RedirectToDashboard(Role role)
-  {
-    return role switch
+      return View(model);
+    }
+
+    // 🔹 Display Login page
+    [HttpGet]
+    public IActionResult Login(string returnUrl = "")
     {
-      Role.Admin => RedirectToAction("Dashboard", "Admin"),
-      Role.Trainer => RedirectToAction("Dashboard", "Trainer"),
-      _ => RedirectToAction("Dashboard", "Customer")
-    };
-  }
+      var model = new LoginViewModel { ReturnUrl = returnUrl };
+      return View(model);
+    }
 
-  // 🔹 哈希密码 (PBKDF2)
-  private string HashPassword(string password)
-  {
-    using var rng = RandomNumberGenerator.Create();
-    byte[] salt = new byte[16];
-    rng.GetBytes(salt);
+    // 🔹 Handle Login POST
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        // 🔸 Sign in with Identity username and password
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Username, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: false);
 
-    using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-    byte[] hash = pbkdf2.GetBytes(32);
+        if (result.Succeeded)
+        {
+          if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+            return Redirect(model.ReturnUrl);
+          else
+            return RedirectToAction("Index", "Home");
+        }
+      }
 
-    return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
-  }
+      ModelState.AddModelError("", "Invalid username/password.");
+      return View(model);
+    }
 
-  // 🔹 验证密码
-  private bool VerifyPassword(string password, string storedHash)
-  {
-    if (string.IsNullOrWhiteSpace(storedHash)) return false;
+    // 🔹 Logout and redirect to Home
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+      await _signInManager.SignOutAsync();
+      return RedirectToAction("Index", "Home");
+    }
 
-    var parts = storedHash.Split(':');
-    if (parts.Length != 2) return false;
+    // 🔹 Initiate Google login
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    {
+      var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
+      var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+      return Challenge(properties, provider);
+    }
 
-    byte[] salt = Convert.FromBase64String(parts[0]);
-    byte[] storedHashBytes = Convert.FromBase64String(parts[1]);
+    // 🔹 Callback from Google
+    [HttpGet]
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+    {
+      returnUrl ??= Url.Content("~/");
+      if (remoteError != null)
+      {
+        ModelState.AddModelError("", $"Error from external provider: {remoteError}");
+        return RedirectToAction(nameof(Login));
+      }
 
-    using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-    byte[] computedHash = pbkdf2.GetBytes(32);
+      var info = await _signInManager.GetExternalLoginInfoAsync();
+      if (info == null)
+        return RedirectToAction(nameof(Login));
 
-    return computedHash.SequenceEqual(storedHashBytes);
+      // 🔸 Try to sign in with external login provider
+      var result = await _signInManager.ExternalLoginSignInAsync(
+          info.LoginProvider, info.ProviderKey, isPersistent: false);
+
+      if (result.Succeeded)
+        return Redirect(returnUrl);
+
+      // 🔸 If user doesn't exist, create one using email
+      var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+      if (email != null)
+      {
+        var user = new User
+        {
+          UserName = email,
+          Email = email,
+          Name = email,
+          JoinDate = DateTime.UtcNow
+        };
+
+        var createResult = await _userManager.CreateAsync(user);
+        if (createResult.Succeeded)
+        {
+          await _userManager.AddLoginAsync(user, info);
+          await _userManager.AddToRoleAsync(user, "Customer");
+          await _signInManager.SignInAsync(user, isPersistent: false);
+          return Redirect(returnUrl);
+        }
+
+        foreach (var error in createResult.Errors)
+          ModelState.AddModelError("", error.Description);
+      }
+
+      return RedirectToAction(nameof(Login));
+    }
+
+    // 🔹 Access Denied
+    public ViewResult AccessDenied() => View();
+
+    // 🔹 Show Change Password form
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+      var model = new ChangePasswordViewModel
+      {
+        Username = User.Identity?.Name ?? ""
+      };
+      return View(model);
+    }
+
+    // 🔹 Handle Change Password POST
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        var user = await _userManager.FindByNameAsync(model.Username);
+        var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+        if (result.Succeeded)
+        {
+          TempData["message"] = "Password changed successfully.";
+          return RedirectToAction("Index", "Home");
+        }
+
+        foreach (var error in result.Errors)
+          ModelState.AddModelError("", error.Description);
+      }
+
+      return View(model);
+    }
   }
 }

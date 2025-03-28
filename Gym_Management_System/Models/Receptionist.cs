@@ -1,10 +1,22 @@
-// Receptionist.cs
-namespace GymManagement.Models;
-public class Receptionist : User
+using System.ComponentModel.DataAnnotations;
+
+namespace GymManagement.Models
 {
-  public required string Responsibilities { get; set; }
-  public string? Notes { get; set; }
-  public required bool IsAvailable { get; set; }
-  public required int BranchId { get; set; }
-  public GymBranch? GymBranch { get; set; }
+  public class Receptionist : User
+  {
+    [Required]
+    [StringLength(200)]
+    public string Responsibilities { get; set; } = string.Empty;
+
+    [StringLength(500)]
+    public string? Notes { get; set; }
+
+    [Required]
+    public bool IsAvailable { get; set; }
+
+    [Required]
+    public int BranchId { get; set; }  // Foreign key to GymBranch
+
+    public GymBranch? GymBranch { get; set; }
+  }
 }

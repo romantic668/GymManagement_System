@@ -7,151 +7,139 @@ using GymManagement.Models;
 using GymManagement.ViewModels;
 using System.Security.Claims;
 
-[Authorize(Roles = "Trainer")]  // 仅允许教练访问
-public class TrainerController : Controller
+namespace GymManagement.Controllers
 {
-  private readonly AppDbContext _dbContext;
-
-  public TrainerController(AppDbContext dbContext)
+  [Authorize(Roles = "Trainer")]
+  public class TrainerController : Controller
   {
-    _dbContext = dbContext;
-  }
+    private readonly AppDbContext _dbContext;
 
-  // 🔹 教练仪表盘
-  public IActionResult Dashboard()
-  {
-    int trainerId;
-    var trainerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(trainerIdClaim, out trainerId))
+    public TrainerController(AppDbContext dbContext)
     {
-      return BadRequest("Invalid Trainer ID.");
+      _dbContext = dbContext;
     }
 
-    var trainer = _dbContext.Trainers
-        .Include(t => t.GymClasses)
-        .Include(t => t.Sessions)
-        .FirstOrDefault(t => t.Id == trainerId);
-
-    if (trainer == null)
+    // 🔹 教练仪表盘
+    public IActionResult Dashboard()
     {
-      return NotFound("Trainer not found.");
+      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      var trainer = _dbContext.Trainers
+          .Include(t => t.GymClasses)
+          .Include(t => t.Sessions)
+          .FirstOrDefault(t => t.Id == trainerId);
+
+      if (trainer == null)
+      {
+        return NotFound("Trainer not found.");
+      }
+
+      return View(trainer);
     }
 
-    return View(trainer);
-  }
-
-  // 🔹 查看教练安排的课程
-  public IActionResult ViewSessions()
-  {
-    int trainerId;
-    var trainerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(trainerIdClaim, out trainerId))
+    // 🔹 查看教练安排的课程
+    public IActionResult ViewSessions()
     {
-      return BadRequest("Invalid Trainer ID.");
-    }
-    var sessions = _dbContext.Sessions
-        .Include(s => s.GymClass)
-        .Include(s => s.Room)
-        .Where(s => s.TrainerId == trainerId)
-        .OrderBy(s => s.SessionDateTime)
-        .ToList();
+      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    return View(sessions);
-  }
+      var sessions = _dbContext.Sessions
+          .Include(s => s.GymClass)
+          .Include(s => s.Room)
+          .Where(s => s.TrainerId == trainerId)
+          .OrderBy(s => s.SessionDateTime)
+          .ToList();
 
-  // 🔹 课程详情
-  public IActionResult SessionDetails(int sessionId)
-  {
-    int trainerId;
-    var trainerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(trainerIdClaim, out trainerId))
-    {
-      return BadRequest("Invalid Trainer ID.");
-    }
-    var session = _dbContext.Sessions
-        .Include(s => s.GymClass)
-        .Include(s => s.Room)
-        .Include(s => s.Bookings)
-            .ThenInclude(b => b.Customer)
-        .FirstOrDefault(s => s.SessionId == sessionId && s.TrainerId == trainerId);
-
-    if (session == null)
-    {
-      return NotFound("Session not found.");
+      return View(sessions);
     }
 
-    return View(session);
-  }
-
-  // 🔹 标记课程考勤
-  [HttpPost]
-  public IActionResult MarkAttendance(int bookingId)
-  {
-    var booking = _dbContext.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
-
-    if (booking == null)
+    // 🔹 查看课程详情
+    public IActionResult SessionDetails(int sessionId)
     {
-      return NotFound("Booking not found.");
+      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      var session = _dbContext.Sessions
+          .Include(s => s.GymClass)
+          .Include(s => s.Room)
+          .Include(s => s.Bookings)
+              .ThenInclude(b => b.Customer)
+          .FirstOrDefault(s => s.SessionId == sessionId && s.TrainerId == trainerId);
+
+      if (session == null)
+      {
+        return NotFound("Session not found.");
+      }
+
+      return View(session);
     }
 
-    booking.Status = BookingStatus.CheckedIn;
-    booking.CheckInTime = DateTime.UtcNow;
-    _dbContext.SaveChanges();
-
-    return RedirectToAction("SessionDetails", new { sessionId = booking.SessionId });
-  }
-
-  // 🔹 修改个人信息
-  public IActionResult EditProfile()
-  {
-    int trainerId;
-    var trainerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(trainerIdClaim, out trainerId))
+    // 🔹 标记课程考勤
+    [HttpPost]
+    public IActionResult MarkAttendance(int bookingId)
     {
-      return BadRequest("Invalid Trainer ID.");
-    }
-    var trainer = _dbContext.Trainers.FirstOrDefault(t => t.Id == trainerId);
+      var booking = _dbContext.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
 
-    if (trainer == null)
-    {
-      return NotFound("Trainer not found.");
+      if (booking == null)
+      {
+        return NotFound("Booking not found.");
+      }
+
+      booking.Status = BookingStatus.CheckedIn;
+      booking.CheckInTime = DateTime.UtcNow;
+      _dbContext.SaveChanges();
+
+      return RedirectToAction("SessionDetails", new { sessionId = booking.SessionId });
     }
 
-    var model = new EditTrainerProfileViewModel
+    // 🔹 修改个人信息 - 显示表单
+    public IActionResult EditProfile()
     {
-      TrainerId = trainer.Id,
-      Name = trainer.Name ?? "Unknown",
-      Email = trainer.Email ?? "No Email Provided",
-      Specialization = trainer.Specialization,
-      ExperienceStarted = trainer.ExperienceStarted
-    };
+      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    return View(model);
-  }
+      var trainer = _dbContext.Trainers.FirstOrDefault(t => t.Id == trainerId);
+      if (trainer == null)
+      {
+        return NotFound("Trainer not found.");
+      }
 
-  // 🔹 处理修改个人信息请求
-  [HttpPost]
-  public IActionResult EditProfile(EditTrainerProfileViewModel model)
-  {
-    int trainerId;
-    var trainerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (!int.TryParse(trainerIdClaim, out trainerId))
-    {
-      return BadRequest("Invalid Trainer ID.");
-    }
-    var trainer = _dbContext.Trainers.FirstOrDefault(t => t.Id == trainerId);
+      var model = new EditTrainerProfileViewModel
+      {
+        TrainerId = trainer.Id,
+        Name = trainer.Name,
+        Email = trainer.Email,
+        Specialization = trainer.Specialization,
+        ExperienceStarted = trainer.ExperienceStarted
+      };
 
-    if (trainer == null)
-    {
-      return NotFound("Trainer not found.");
+      return View(model);
     }
 
-    trainer.Name = model.Name;
-    trainer.Email = model.Email;
-    trainer.Specialization = model.Specialization ?? "General";
+    // 🔹 修改个人信息 - 提交表单
+    [HttpPost]
+    public IActionResult EditProfile(EditTrainerProfileViewModel model)
+    {
+      if (!ModelState.IsValid)
+      {
+        return View(model);
+      }
 
+      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      var trainer = _dbContext.Trainers.FirstOrDefault(t => t.Id == trainerId);
 
-    _dbContext.SaveChanges();
-    return RedirectToAction("Dashboard");
+      if (trainer == null)
+      {
+        return NotFound("Trainer not found.");
+      }
+
+      trainer.Name = model.Name;
+      trainer.Email = model.Email;
+      trainer.Specialization = string.IsNullOrWhiteSpace(model.Specialization)
+          ? "Unknown"
+          : model.Specialization;
+      trainer.ExperienceStarted = model.ExperienceStarted ?? DateTime.Now;
+
+      _dbContext.SaveChanges();
+
+      return RedirectToAction("Dashboard");
+    }
   }
 }

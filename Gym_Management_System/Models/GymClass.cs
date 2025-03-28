@@ -1,15 +1,34 @@
-namespace GymManagement.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class GymClass
+namespace GymManagement.Models
 {
-  public required int GymClassId { get; set; }
-  public required string ClassName { get; set; }
-  public required DateTime AvailableTime { get; set; }
-  public required int Duration { get; set; } // in minutes
-  public string? Description { get; set; }
+  public class GymClass
+  {
+    [Key]
+    public int GymClassId { get; set; }
 
-  public required int TrainerId { get; set; }
-  public Trainer? Trainer { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string ClassName { get; set; } = string.Empty;
 
-  public required ICollection<Session> Sessions { get; set; } = new List<Session>();
+    [Required]
+    public DateTime AvailableTime { get; set; }
+
+    [Required]
+    [Range(1, 300, ErrorMessage = "Duration should be between 1 and 300 minutes.")]
+    public int Duration { get; set; } // in minutes
+
+    [StringLength(500)]
+    public string? Description { get; set; }
+
+    [Required]
+    public string TrainerId { get; set; } = string.Empty;  // Trainer inherits from IdentityUser
+
+    [ForeignKey("TrainerId")]
+    public Trainer Trainer { get; set; } = null!;
+
+    [Required]
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
+  }
 }

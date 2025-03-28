@@ -1,21 +1,23 @@
-// AdminController.cs
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GymManagement.Data;
 using GymManagement.Models;
 
-[Authorize(Roles = "Admin")]  // 仅管理员可访问
+[Authorize(Roles = "Admin")] // Only Admin can access this controller
 public class AdminController : Controller
 {
   private readonly AppDbContext _dbContext;
+  private readonly UserManager<IdentityUser> _userManager;
 
-  public AdminController(AppDbContext dbContext)
+  public AdminController(AppDbContext dbContext, UserManager<IdentityUser> userManager)
   {
     _dbContext = dbContext;
+    _userManager = userManager;
   }
 
-  // 🔹 管理员仪表盘
+  // Admin Dashboard
   public IActionResult Dashboard()
   {
     var dashboardData = new AdminDashboardViewModel
@@ -29,21 +31,23 @@ public class AdminController : Controller
     return View(dashboardData);
   }
 
-  // 🔹 管理所有会员
+  // Manage Members
   public IActionResult ManageMembers()
   {
     var members = _dbContext.Customers.ToList();
+    ViewBag.Error = TempData["Error"];
     return View(members);
   }
 
-  // 🔹 管理所有教练
+  // Manage Trainers
   public IActionResult ManageTrainers()
   {
     var trainers = _dbContext.Trainers.ToList();
+    ViewBag.Error = TempData["Error"];
     return View(trainers);
   }
 
-  // 🔹 管理所有课程安排
+  // Manage Sessions
   public IActionResult ManageSessions()
   {
     var sessions = _dbContext.Sessions
@@ -56,49 +60,52 @@ public class AdminController : Controller
     return View(sessions);
   }
 
-  // 🔹 管理所有健身房分店
+  // Manage Gym Branches
   public IActionResult ManageGymBranches()
   {
     var branches = _dbContext.GymBranches.ToList();
     return View(branches);
   }
 
-  // 🔹 删除会员或教练
+  // Delete Member or Trainer
   [HttpPost]
   [ValidateAntiForgeryToken]
-  public IActionResult DeleteUser(int userId)
+  public async Task<IActionResult> DeleteUser(string userId)
   {
-    var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
-
+    var user = await _userManager.FindByIdAsync(userId);
     if (user == null)
     {
       return NotFound("User not found.");
     }
 
-    // 确保删除前不影响系统完整性
-    if (user.Role == Role.Customer)
+    if (await _userManager.IsInRoleAsync(user, "Customer"))
     {
       var hasBookings = _dbContext.Bookings.Any(b => b.CustomerId == userId);
       var hasPayments = _dbContext.Payments.Any(p => p.CustomerId == userId);
+
       if (hasBookings || hasPayments)
       {
-        ViewBag.Error = "Cannot delete a customer with existing bookings or payments.";
+        TempData["Error"] = "Cannot delete a customer who has existing bookings or payments.";
         return RedirectToAction("ManageMembers");
       }
     }
-    else if (user.Role == Role.Trainer)
+    else if (await _userManager.IsInRoleAsync(user, "Trainer"))
     {
       var hasSessions = _dbContext.Sessions.Any(s => s.TrainerId == userId);
       if (hasSessions)
       {
-        ViewBag.Error = "Cannot delete a trainer who is assigned to sessions.";
+        TempData["Error"] = "Cannot delete a trainer who is assigned to sessions.";
         return RedirectToAction("ManageTrainers");
       }
     }
 
-    _dbContext.Users.Remove(user);
-    _dbContext.SaveChanges();
+    var result = await _userManager.DeleteAsync(user);
+    if (!result.Succeeded)
+    {
+      TempData["Error"] = "Failed to delete user.";
+    }
 
-    return RedirectToAction(user.Role == Role.Customer ? "ManageMembers" : "ManageTrainers");
+    bool isCustomer = await _userManager.IsInRoleAsync(user, "Customer");
+    return RedirectToAction(isCustomer ? "ManageMembers" : "ManageTrainers");
   }
 }

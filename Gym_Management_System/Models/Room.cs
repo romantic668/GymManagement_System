@@ -1,11 +1,24 @@
-// Room.cs
-namespace GymManagement.Models;
-public class Room
+using System.ComponentModel.DataAnnotations;
+
+namespace GymManagement.Models
 {
-  public required int RoomId { get; set; }
-  public string? RoomName { get; set; }
-  public required int Capacity { get; set; }
-  public required bool IsAvailable { get; set; }
-  public required int BranchId { get; set; }  // fk
-  public GymBranch? GymBranch { get; set; }
+  public class Room
+  {
+    [Key]
+    public int RoomId { get; set; }
+
+    [StringLength(100)]
+    public string RoomName { get; set; } = string.Empty;
+
+    [Required]
+    public int Capacity { get; set; }
+
+    [Required]
+    public bool IsAvailable { get; set; }
+
+    [Required]
+    public int BranchId { get; set; }  // Foreign Key
+
+    public GymBranch? GymBranch { get; set; }
+  }
 }

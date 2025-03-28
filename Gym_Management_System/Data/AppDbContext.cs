@@ -60,17 +60,24 @@ namespace GymManagement.Data
        );
 
       //  User (Admin)
-      modelBuilder.Entity<User>().HasData(
-          new User
-          {
-            Id = 1,
-            Name = "Admin User",
-            Email = "admin@example.com",
-            Password = "Admin@123", //
-            Role = Role.Admin,
-            JoinDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-          }
+
+      modelBuilder.Entity<Admin>().HasData(
+        new Admin
+        {
+          Id = 1,
+          Name = "Admin User",
+          Email = "admin@example.com",
+          Password = "Admin@123",
+          Role = Role.Admin,
+          JoinDate = new DateTime(2024, 1, 1),
+
+          Sessions = new List<Session>(),
+          Trainers = new List<Trainer>(),
+          GymClasses = new List<GymClass>(),
+          Rooms = new List<Room>()
+        }
       );
+
 
       //  Customer
       modelBuilder.Entity<Customer>().HasData(

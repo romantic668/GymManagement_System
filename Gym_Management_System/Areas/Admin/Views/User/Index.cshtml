@@ -1,0 +1,102 @@
+﻿@model UserViewModel
+@{
+    ViewData["Title"] = "Manage Users and Roles";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="container mt-5 text-white">
+    <h2 class="mb-4 text-center">User Management</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Users</h4>
+        <a asp-action="Add" class="btn btn-success">+ Add User</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-striped table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Username</th>
+                    <th>Roles</th>
+                    <th colspan="3" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Users.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">There are no user accounts.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>
+                                @foreach (var role in user.RoleNames)
+                                {
+                                    <span class="badge bg-info text-dark me-1">@role</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <form method="post" asp-action="Delete" asp-route-id="@user.Id">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete User</button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <form method="post" asp-action="AddToAdmin" asp-route-id="@user.Id">
+                                    <button type="submit" class="btn btn-warning btn-sm">Make Admin</button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <form method="post" asp-action="RemoveFromAdmin" asp-route-id="@user.Id">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Remove Admin</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="bg-light mt-5" />
+
+    <h4 class="mt-4">Roles</h4>
+
+    @if (!Model.Roles.Any())
+    {
+        <form method="post" asp-action="CreateAdminRole">
+            <button type="submit" class="btn btn-outline-primary">Create Admin Role</button>
+        </form>
+    }
+    else
+    {
+        <div class="table-responsive mt-3">
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th class="text-center">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var role in Model.Roles)
+                    {
+                        <tr>
+                            <td>@role.Name</td>
+                            <td class="text-center">
+                                <form method="post" asp-action="DeleteRole" asp-route-id="@role.Id">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete Role</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

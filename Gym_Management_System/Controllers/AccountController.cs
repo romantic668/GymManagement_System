@@ -17,17 +17,15 @@ namespace GymManagement.Controllers
       _signInManager = signInManager;
     }
 
-    // 🔹 Display Register page
     [HttpGet]
     public IActionResult Register() => View();
 
-    // 🔹 Handle Register POST
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
       if (ModelState.IsValid)
       {
-        // 🔸 Check if username already exists
         var existingUserByUsername = await _userManager.FindByNameAsync(model.Username);
         if (existingUserByUsername != null)
         {
@@ -35,7 +33,6 @@ namespace GymManagement.Controllers
           return View(model);
         }
 
-        // 🔸 Check if email already exists
         var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
         if (existingUserByEmail != null)
         {
@@ -43,34 +40,41 @@ namespace GymManagement.Controllers
           return View(model);
         }
 
-        // 🔸 Create new user
         var user = new User
         {
           UserName = model.Username,
           Email = model.Email,
           Name = model.Name,
-          JoinDate = DateTime.UtcNow
+          JoinDate = DateTime.UtcNow,
+          DOB = model.DOB // ✅ 加上这一行
+
         };
 
-        // 🔸 Save to Identity database
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
-          // 🔸 Assign default role
           await _userManager.AddToRoleAsync(user, "Customer");
+          user.RoleNames = await _userManager.GetRolesAsync(user);
           await _signInManager.SignInAsync(user, isPersistent: false);
-          return RedirectToAction("Index", "Home");
+          return RedirectToAction("Dashboard", "Customer");
         }
 
-        // 🔸 Show identity creation errors
         foreach (var error in result.Errors)
-          ModelState.AddModelError("", error.Description);
+        {
+          if (error.Code.Contains("Password"))
+            ModelState.AddModelError("Password", error.Description);
+          else if (error.Code.Contains("Email"))
+            ModelState.AddModelError("Email", error.Description);
+          else if (error.Code.Contains("UserName"))
+            ModelState.AddModelError("Username", error.Description);
+          else
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
       }
 
       return View(model);
     }
 
-    // 🔹 Display Login page
     [HttpGet]
     public IActionResult Login(string returnUrl = "")
     {
@@ -78,38 +82,51 @@ namespace GymManagement.Controllers
       return View(model);
     }
 
-    // 🔹 Handle Login POST
     [HttpPost]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
-      if (ModelState.IsValid)
-      {
-        // 🔸 Sign in with Identity username and password
-        var result = await _signInManager.PasswordSignInAsync(
-            model.Username, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: false);
+      if (!ModelState.IsValid)
+        return View(model);
 
-        if (result.Succeeded)
+      var result = await _signInManager.PasswordSignInAsync(
+          model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+      if (result.Succeeded)
+      {
+        var user = await _userManager.FindByNameAsync(model.Username);
+        if (user != null)
         {
-          if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-            return Redirect(model.ReturnUrl);
-          else
-            return RedirectToAction("Index", "Home");
+          user.RoleNames = await _userManager.GetRolesAsync(user);
+
+          if (await _userManager.IsInRoleAsync(user, "Admin"))
+            return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
+
+          if (await _userManager.IsInRoleAsync(user, "Trainer"))
+            return RedirectToAction("Dashboard", "Trainer");
+
+          if (await _userManager.IsInRoleAsync(user, "Receptionist"))
+            return RedirectToAction("Dashboard", "Receptionist");
+
+          if (await _userManager.IsInRoleAsync(user, "Customer"))
+            return RedirectToAction("Dashboard", "Customer");
         }
+
+        return RedirectToAction("Index", "Home");
       }
 
-      ModelState.AddModelError("", "Invalid username/password.");
+      ModelState.AddModelError(string.Empty, "Invalid username or password.");
       return View(model);
     }
 
-    // 🔹 Logout and redirect to Home
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
       await _signInManager.SignOutAsync();
       return RedirectToAction("Index", "Home");
     }
 
-    // 🔹 Initiate Google login
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult ExternalLogin(string provider, string? returnUrl = null)
@@ -119,11 +136,11 @@ namespace GymManagement.Controllers
       return Challenge(properties, provider);
     }
 
-    // 🔹 Callback from Google
     [HttpGet]
     public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
     {
       returnUrl ??= Url.Content("~/");
+
       if (remoteError != null)
       {
         ModelState.AddModelError("", $"Error from external provider: {remoteError}");
@@ -131,25 +148,23 @@ namespace GymManagement.Controllers
       }
 
       var info = await _signInManager.GetExternalLoginInfoAsync();
-      if (info == null)
-        return RedirectToAction(nameof(Login));
+      if (info == null) return RedirectToAction(nameof(Login));
 
-      // 🔸 Try to sign in with external login provider
       var result = await _signInManager.ExternalLoginSignInAsync(
           info.LoginProvider, info.ProviderKey, isPersistent: false);
 
-      if (result.Succeeded)
-        return Redirect(returnUrl);
+      if (result.Succeeded) return Redirect(returnUrl);
 
-      // 🔸 If user doesn't exist, create one using email
       var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+      var fullName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email ?? "Google User";
+
       if (email != null)
       {
         var user = new User
         {
           UserName = email,
           Email = email,
-          Name = email,
+          Name = fullName,
           JoinDate = DateTime.UtcNow
         };
 
@@ -158,8 +173,9 @@ namespace GymManagement.Controllers
         {
           await _userManager.AddLoginAsync(user, info);
           await _userManager.AddToRoleAsync(user, "Customer");
+          user.RoleNames = await _userManager.GetRolesAsync(user);
           await _signInManager.SignInAsync(user, isPersistent: false);
-          return Redirect(returnUrl);
+          return RedirectToAction("Dashboard", "Customer");
         }
 
         foreach (var error in createResult.Errors)
@@ -169,10 +185,8 @@ namespace GymManagement.Controllers
       return RedirectToAction(nameof(Login));
     }
 
-    // 🔹 Access Denied
-    public ViewResult AccessDenied() => View();
+    public IActionResult AccessDenied() => View();
 
-    // 🔹 Show Change Password form
     [HttpGet]
     public IActionResult ChangePassword()
     {
@@ -183,15 +197,20 @@ namespace GymManagement.Controllers
       return View(model);
     }
 
-    // 🔹 Handle Change Password POST
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
     {
       if (ModelState.IsValid)
       {
         var user = await _userManager.FindByNameAsync(model.Username);
-        var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+        if (user == null)
+        {
+          ModelState.AddModelError("", "User not found.");
+          return View(model);
+        }
 
+        var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
         if (result.Succeeded)
         {
           TempData["message"] = "Password changed successfully.";

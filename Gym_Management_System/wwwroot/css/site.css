@@ -1,17 +1,20 @@
 .home-page {
   text-align: center;
 }
+
 .home-page h1 {
   color: #0a1c27;
   font-weight: bold;
   font-size: 4rem;
   padding: 2rem;
 }
+
 .home-page p {
   color: #2c3e50;
   font-size: 1rem;
   margin-left: 2rem;
 }
+
 .home-page .start-btn {
   padding: 1rem;
   margin: 2rem;
@@ -23,6 +26,7 @@
   color: #fff;
   border: 2px solid #fff;
 }
+
 .home-page .library-congratulation {
   width: 100vw !important;
   max-width: none;
@@ -33,10 +37,12 @@
   background-color: #eaf3f4;
   position: relative;
 }
+
 .home-page .library-congratulation h2 {
   padding-top: 8rem;
   padding-bottom: 3rem;
 }
+
 .home-page .library-congratulation .doll {
   position: absolute;
   right: 20px;
@@ -44,6 +50,7 @@
   width: 10rem;
   opacity: 0.8;
 }
+
 .home-page .partners-container {
   width: 100vw !important;
   max-width: max-content;
@@ -51,11 +58,13 @@
   overflow: hidden;
   padding: 1rem 0;
 }
+
 .home-page .partners-container p {
   text-align: left;
   font-size: 2rem;
   font-weight: 700;
 }
+
 .home-page .partners-container .scrolling-wrapper {
   position: relative;
   overflow: hidden;
@@ -64,6 +73,7 @@
   display: flex;
   align-items: center;
 }
+
 .home-page .partners-container .scrolling-wrapper .logos {
   display: flex;
   align-items: center;
@@ -72,24 +82,29 @@
   will-change: transform;
   width: max-content;
 }
+
 .home-page .partners-container .scrolling-wrapper .logos::after {
   content: "";
   display: flex;
   align-items: center;
 }
+
 .home-page .partners-container .scrolling-wrapper img {
   max-height: 80px;
   flex: 0 0 auto;
   margin-right: 2rem;
 }
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-100%);
   }
 }
+
 .btn.custom-btn {
   background-color: #4bc1d2 !important;
   border-color: #4bc1d2 !important;
@@ -98,31 +113,44 @@
 
 a.custom-link {
   color: #4bc1d2 !important;
-  text-decoration: none !important; 
+  text-decoration: none !important;
   transition: color 0.2s ease-in-out;
   margin-right: 20px;
 }
 
 a.custom-delete {
-  color: #e74c3c !important; 
+  color: #e74c3c !important;
   text-decoration: none !important;
   transition: color 0.2s ease-in-out;
 }
 
 a.custom-link:hover {
-  color: #3795a0 !important; 
+  color: #3795a0 !important;
 }
 
 a.custom-delete:hover {
-  color: #c0392b !important; 
+  color: #c0392b !important;
 }
 
 .navbar-nav .nav-link.active {
   color: white !important;
-  background-color: #4bc1d2 !important; /* 主题色 */
-  border-radius: 5px; /* 圆角 */
+  background-color: #4bc1d2 !important;
+  /* 主题色 */
+  border-radius: 5px;
+  /* 圆角 */
   padding: 5px 10px;
   font-weight: bold;
+}
+
+/* 🔴 Real-time Validation Styles */
+input.input-validation-error {
+  border: 1px solid #dc3545 !important;
+  background-color: #f8d7da !important;
+  color: #212529;
+}
+
+span.field-validation-error {
+  color: #dc3545;
 }
 
 

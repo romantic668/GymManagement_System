@@ -22,7 +22,11 @@ namespace GymManagement.Controllers
     // 🔹 教练仪表盘
     public IActionResult Dashboard()
     {
-      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      string? trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      if (string.IsNullOrEmpty(trainerId))
+      {
+        return BadRequest("Invalid trainer identifier.");
+      }
 
       var trainer = _dbContext.Trainers
           .Include(t => t.GymClasses)
@@ -35,13 +39,17 @@ namespace GymManagement.Controllers
       }
 
       return View(trainer);
+
     }
 
     // 🔹 查看教练安排的课程
     public IActionResult ViewSessions()
     {
-      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+      string? trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      if (string.IsNullOrEmpty(trainerId))
+      {
+        return BadRequest("Invalid trainer identifier.");
+      }
       var sessions = _dbContext.Sessions
           .Include(s => s.GymClass)
           .Include(s => s.Room)
@@ -55,7 +63,12 @@ namespace GymManagement.Controllers
     // 🔹 查看课程详情
     public IActionResult SessionDetails(int sessionId)
     {
-      string trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      string? trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      if (string.IsNullOrEmpty(trainerId))
+      {
+        return BadRequest("Invalid trainer identifier.");
+      }
+
 
       var session = _dbContext.Sessions
           .Include(s => s.GymClass)

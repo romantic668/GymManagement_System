@@ -80,16 +80,37 @@ namespace GymManagement.Migrations
                         new
                         {
                             BranchId = 1,
-                            Address = "123 Main St",
+                            Address = "101 Main St",
                             BranchName = "Downtown Gym",
-                            ContactNumber = "123-456-7890"
+                            ContactNumber = "555-1001"
                         },
                         new
                         {
                             BranchId = 2,
-                            Address = "456 High St",
+                            Address = "202 High St",
                             BranchName = "Uptown Gym",
-                            ContactNumber = "987-654-3210"
+                            ContactNumber = "555-2002"
+                        },
+                        new
+                        {
+                            BranchId = 3,
+                            Address = "303 East Ave",
+                            BranchName = "Eastside Gym",
+                            ContactNumber = "555-3003"
+                        },
+                        new
+                        {
+                            BranchId = 4,
+                            Address = "404 West Blvd",
+                            BranchName = "Westside Gym",
+                            ContactNumber = "555-4004"
+                        },
+                        new
+                        {
+                            BranchId = 5,
+                            Address = "505 Central Rd",
+                            BranchName = "Central Gym",
+                            ContactNumber = "555-5005"
                         });
                 });
 
@@ -165,9 +186,6 @@ namespace GymManagement.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("GymBranchBranchId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("INTEGER");
 
@@ -178,7 +196,7 @@ namespace GymManagement.Migrations
 
                     b.HasKey("RoomId");
 
-                    b.HasIndex("GymBranchBranchId");
+                    b.HasIndex("BranchId");
 
                     b.ToTable("Rooms");
 
@@ -194,10 +212,74 @@ namespace GymManagement.Migrations
                         new
                         {
                             RoomId = 2,
+                            BranchId = 1,
+                            Capacity = 25,
+                            IsAvailable = true,
+                            RoomName = "Cardio Room"
+                        },
+                        new
+                        {
+                            RoomId = 3,
                             BranchId = 2,
                             Capacity = 30,
                             IsAvailable = true,
-                            RoomName = "Weightlifting Room"
+                            RoomName = "Weight Room"
+                        },
+                        new
+                        {
+                            RoomId = 4,
+                            BranchId = 2,
+                            Capacity = 18,
+                            IsAvailable = true,
+                            RoomName = "Crossfit Zone"
+                        },
+                        new
+                        {
+                            RoomId = 5,
+                            BranchId = 3,
+                            Capacity = 15,
+                            IsAvailable = true,
+                            RoomName = "Spin Studio"
+                        },
+                        new
+                        {
+                            RoomId = 6,
+                            BranchId = 3,
+                            Capacity = 20,
+                            IsAvailable = true,
+                            RoomName = "Dance Studio"
+                        },
+                        new
+                        {
+                            RoomId = 7,
+                            BranchId = 4,
+                            Capacity = 12,
+                            IsAvailable = true,
+                            RoomName = "HIIT Area"
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            BranchId = 4,
+                            Capacity = 16,
+                            IsAvailable = true,
+                            RoomName = "Pilates Room"
+                        },
+                        new
+                        {
+                            RoomId = 9,
+                            BranchId = 5,
+                            Capacity = 10,
+                            IsAvailable = true,
+                            RoomName = "Stretch Zone"
+                        },
+                        new
+                        {
+                            RoomId = 10,
+                            BranchId = 5,
+                            Capacity = 22,
+                            IsAvailable = true,
+                            RoomName = "Functional Room"
                         });
                 });
 
@@ -249,6 +331,9 @@ namespace GymManagement.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DOB")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Discriminator")
@@ -451,6 +536,9 @@ namespace GymManagement.Migrations
                 {
                     b.HasBaseType("GymManagement.Models.User");
 
+                    b.Property<int>("GymBranchId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("MembershipType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -458,6 +546,8 @@ namespace GymManagement.Migrations
 
                     b.Property<DateTime>("SubscriptionDate")
                         .HasColumnType("TEXT");
+
+                    b.HasIndex("GymBranchId");
 
                     b.HasDiscriminator().HasValue("Customer");
                 });
@@ -467,9 +557,6 @@ namespace GymManagement.Migrations
                     b.HasBaseType("GymManagement.Models.User");
 
                     b.Property<int>("BranchId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("GymBranchBranchId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsAvailable")
@@ -484,15 +571,12 @@ namespace GymManagement.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
-                    b.HasIndex("GymBranchBranchId");
+                    b.HasIndex("BranchId");
 
                     b.ToTable("AspNetUsers", t =>
                         {
                             t.Property("BranchId")
                                 .HasColumnName("Receptionist_BranchId");
-
-                            t.Property("GymBranchBranchId")
-                                .HasColumnName("Receptionist_GymBranchBranchId");
                         });
 
                     b.HasDiscriminator().HasValue("Receptionist");
@@ -508,14 +592,11 @@ namespace GymManagement.Migrations
                     b.Property<DateTime>("ExperienceStarted")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GymBranchBranchId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasIndex("GymBranchBranchId");
+                    b.HasIndex("BranchId");
 
                     b.HasDiscriminator().HasValue("Trainer");
                 });
@@ -571,7 +652,9 @@ namespace GymManagement.Migrations
                 {
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
                         .WithMany("Rooms")
-                        .HasForeignKey("GymBranchBranchId");
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("GymBranch");
                 });
@@ -589,7 +672,7 @@ namespace GymManagement.Migrations
                         .HasForeignKey("ReceptionistId");
 
                     b.HasOne("GymManagement.Models.Room", "Room")
-                        .WithMany()
+                        .WithMany("Sessions")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -660,11 +743,24 @@ namespace GymManagement.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GymManagement.Models.Customer", b =>
+                {
+                    b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
+                        .WithMany()
+                        .HasForeignKey("GymBranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GymBranch");
+                });
+
             modelBuilder.Entity("GymManagement.Models.Receptionist", b =>
                 {
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
                         .WithMany("Receptionists")
-                        .HasForeignKey("GymBranchBranchId");
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("GymBranch");
                 });
@@ -673,7 +769,9 @@ namespace GymManagement.Migrations
                 {
                     b.HasOne("GymManagement.Models.GymBranch", "GymBranch")
                         .WithMany("Trainers")
-                        .HasForeignKey("GymBranchBranchId");
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("GymBranch");
                 });
@@ -688,6 +786,11 @@ namespace GymManagement.Migrations
                 });
 
             modelBuilder.Entity("GymManagement.Models.GymClass", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("GymManagement.Models.Room", b =>
                 {
                     b.Navigation("Sessions");
                 });

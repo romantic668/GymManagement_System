@@ -17,6 +17,10 @@ namespace GymManagement.Models
     [Required]
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
+    // ✅ 加上这两行
+    public int GymBranchId { get; set; }
+    public GymBranch? GymBranch { get; set; }
+
     // EF Core requires a parameterless constructor
     public Customer()
     {

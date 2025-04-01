@@ -1,0 +1,111 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper Html
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject UserManager<GymManagement.Models.User> UserManager
+@inject SignInManager<GymManagement.Models.User> SignInManager
+
+@{
+    var currentController = HttpContextAccessor.HttpContext?.Request.RouteValues["controller"]?.ToString();
+    var currentAction = HttpContextAccessor.HttpContext?.Request.RouteValues["action"]?.ToString();
+    var currentUser = await UserManager.GetUserAsync(User);
+    var displayName = currentUser?.Name ?? User.Identity?.Name ?? "User";
+
+    // 🔁 获取当前用户的角色列表
+    var roles = currentUser != null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
+    bool isOnlyAdmin = roles.Count == 1 && roles.Contains("Admin");
+
+    // ✅ 决定跳转链接：如果只有 Admin 身份则跳 Home/Index，否则跳 Home/Dashboard 或其它身份主页
+    string logoController = "Home";
+    string logoAction = "Index"; // 默认主页
+
+    if (!isOnlyAdmin)
+    {
+        if (roles.Contains("Trainer"))
+        {
+            logoController = "Trainer";
+            logoAction = "Dashboard"; // 🔁 对应 Trainer/Dashboard.cshtml
+        }
+        else if (roles.Contains("Receptionist"))
+        {
+            logoController = "Receptionist";
+            logoAction = "ManageBookings"; // 🔁 你可以添加对应视图或已有视图
+        }
+        else if (roles.Contains("Customer"))
+        {
+            logoController = "Customer";
+            logoAction = "Dashboard"; // 🔁 对应 Customer/Dashboard.cshtml
+        }
+    }
+
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Area - GymManagement</title>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/style.css" rel="stylesheet" />
+</head>
+
+<body class="bg-dark text-white">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary px-4">
+        <!-- ✅ LOGO：根据角色数量动态跳转 -->
+        <a class="navbar-brand text-warning fw-bold" asp-area="" asp-controller="@logoController"
+            asp-action="@logoAction">
+            🏋️ GymAdmin
+        </a>
+
+        <div class="collapse navbar-collapse d-flex justify-content-between">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Admin" && currentAction == "Dashboard" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "User" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="User" asp-action="Index">Manage Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "ManageGymBranches" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="Admin" asp-action="ManageGymBranches">Manage Gym Branches</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "ManageMembers" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="Admin" asp-action="ManageMembers">Manage Members</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "ManageSessions" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="Admin" asp-action="ManageSessions">Manage Sessions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentAction == "ManageTrainers" ? "active fw-bold text-white" : "text-secondary")"
+                        asp-area="Admin" asp-controller="Admin" asp-action="ManageTrainers">Manage Trainers</a>
+                </li>
+            </ul>
+
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-white">Hello, @displayName!</span>
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">LOGOUT</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    @RenderSection("Scripts", required: false)
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -52,7 +52,7 @@ public class ClassScheduleController : Controller
   [HttpPost]
   public IActionResult BookSession(int sessionId)
   {
-    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     if (string.IsNullOrEmpty(userId))
     {
@@ -100,7 +100,7 @@ public class ClassScheduleController : Controller
   [HttpPost]
   public IActionResult CancelBooking(int bookingId)
   {
-    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     if (string.IsNullOrEmpty(userId))
     {

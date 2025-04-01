@@ -20,5 +20,8 @@ namespace GymManagement.Models
     public int BranchId { get; set; }  // Foreign Key
 
     public GymBranch? GymBranch { get; set; }
+
+    // ✅ 新增这行
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
   }
 }

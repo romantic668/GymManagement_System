@@ -115,6 +115,10 @@
       });
 
       $.validator.unobtrusive.adapters.addSingleVal("minage", "years");
+
+      $("#registerForm").removeData("validator");
+      $("#registerForm").removeData("unobtrusiveValidation");
+      $.validator.unobtrusive.parse("#registerForm");
     });
   </script>
 }

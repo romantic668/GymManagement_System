@@ -42,6 +42,10 @@ namespace GymManagement.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("BookingId");
 
                     b.HasIndex("CustomerId");
@@ -49,6 +53,8 @@ namespace GymManagement.Migrations
                     b.HasIndex("ReceptionistId");
 
                     b.HasIndex("SessionId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
                 });
@@ -304,6 +310,10 @@ namespace GymManagement.Migrations
                     b.Property<DateTime>("SessionDateTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SessionName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("TrainerId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -539,6 +549,13 @@ namespace GymManagement.Migrations
                     b.Property<int>("GymBranchId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("MembershipExpiry")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MembershipStatus")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("MembershipType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -586,6 +603,10 @@ namespace GymManagement.Migrations
                 {
                     b.HasBaseType("GymManagement.Models.User");
 
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
 
@@ -619,11 +640,19 @@ namespace GymManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GymManagement.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
 
                     b.Navigation("Receptionist");
 
                     b.Navigation("Session");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GymManagement.Models.GymClass", b =>

@@ -9,6 +9,9 @@ namespace GymManagement.Models
     public int SessionId { get; set; }
 
     [Required]
+    public string SessionName { get; set; } // 修改了数据类型
+
+    [Required]
     public DateTime SessionDateTime { get; set; }
 
     [Required]

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250401032514_UpdatedModel")]
-    partial class UpdatedModel
+    [Migration("20250402182516_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,10 @@ namespace GymManagement.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("BookingId");
 
                     b.HasIndex("CustomerId");
@@ -52,6 +56,8 @@ namespace GymManagement.Migrations
                     b.HasIndex("ReceptionistId");
 
                     b.HasIndex("SessionId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
                 });
@@ -83,16 +89,37 @@ namespace GymManagement.Migrations
                         new
                         {
                             BranchId = 1,
-                            Address = "123 Main St",
+                            Address = "101 Main St",
                             BranchName = "Downtown Gym",
-                            ContactNumber = "123-456-7890"
+                            ContactNumber = "555-1001"
                         },
                         new
                         {
                             BranchId = 2,
-                            Address = "456 High St",
+                            Address = "202 High St",
                             BranchName = "Uptown Gym",
-                            ContactNumber = "987-654-3210"
+                            ContactNumber = "555-2002"
+                        },
+                        new
+                        {
+                            BranchId = 3,
+                            Address = "303 East Ave",
+                            BranchName = "Eastside Gym",
+                            ContactNumber = "555-3003"
+                        },
+                        new
+                        {
+                            BranchId = 4,
+                            Address = "404 West Blvd",
+                            BranchName = "Westside Gym",
+                            ContactNumber = "555-4004"
+                        },
+                        new
+                        {
+                            BranchId = 5,
+                            Address = "505 Central Rd",
+                            BranchName = "Central Gym",
+                            ContactNumber = "555-5005"
                         });
                 });
 
@@ -194,10 +221,74 @@ namespace GymManagement.Migrations
                         new
                         {
                             RoomId = 2,
+                            BranchId = 1,
+                            Capacity = 25,
+                            IsAvailable = true,
+                            RoomName = "Cardio Room"
+                        },
+                        new
+                        {
+                            RoomId = 3,
                             BranchId = 2,
                             Capacity = 30,
                             IsAvailable = true,
-                            RoomName = "Weightlifting Room"
+                            RoomName = "Weight Room"
+                        },
+                        new
+                        {
+                            RoomId = 4,
+                            BranchId = 2,
+                            Capacity = 18,
+                            IsAvailable = true,
+                            RoomName = "Crossfit Zone"
+                        },
+                        new
+                        {
+                            RoomId = 5,
+                            BranchId = 3,
+                            Capacity = 15,
+                            IsAvailable = true,
+                            RoomName = "Spin Studio"
+                        },
+                        new
+                        {
+                            RoomId = 6,
+                            BranchId = 3,
+                            Capacity = 20,
+                            IsAvailable = true,
+                            RoomName = "Dance Studio"
+                        },
+                        new
+                        {
+                            RoomId = 7,
+                            BranchId = 4,
+                            Capacity = 12,
+                            IsAvailable = true,
+                            RoomName = "HIIT Area"
+                        },
+                        new
+                        {
+                            RoomId = 8,
+                            BranchId = 4,
+                            Capacity = 16,
+                            IsAvailable = true,
+                            RoomName = "Pilates Room"
+                        },
+                        new
+                        {
+                            RoomId = 9,
+                            BranchId = 5,
+                            Capacity = 10,
+                            IsAvailable = true,
+                            RoomName = "Stretch Zone"
+                        },
+                        new
+                        {
+                            RoomId = 10,
+                            BranchId = 5,
+                            Capacity = 22,
+                            IsAvailable = true,
+                            RoomName = "Functional Room"
                         });
                 });
 
@@ -220,6 +311,10 @@ namespace GymManagement.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SessionDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SessionName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TrainerId")
@@ -249,6 +344,9 @@ namespace GymManagement.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DOB")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Discriminator")
@@ -454,6 +552,13 @@ namespace GymManagement.Migrations
                     b.Property<int>("GymBranchId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("MembershipExpiry")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MembershipStatus")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("MembershipType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -501,6 +606,10 @@ namespace GymManagement.Migrations
                 {
                     b.HasBaseType("GymManagement.Models.User");
 
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("BranchId")
                         .HasColumnType("INTEGER");
 
@@ -534,11 +643,19 @@ namespace GymManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GymManagement.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
 
                     b.Navigation("Receptionist");
 
                     b.Navigation("Session");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GymManagement.Models.GymClass", b =>

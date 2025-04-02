@@ -66,16 +66,22 @@
                                 }
                                 else if (User.IsInRole("Receptionist"))
                                 {
+                                    <li><a asp-controller="Trainer" asp-action="Dashboard">Dashboard</a></li>
                                     <li><a asp-controller="Receptionist" asp-action="ManageBookings">Bookings</a></li>
                                     <li><a asp-controller="Receptionist" asp-action="CheckIn">Check In</a></li>
                                 }
                                 else if (User.IsInRole("Customer"))
-                                {
+                                {<li><a asp-controller="Customer" asp-action="Dashboard">Customer Dashboard</a></li>
                                     <li><a asp-controller="Customer" asp-action="Profile">Profile</a></li>
-                                    <li><a asp-controller="ClassSchedule" asp-action="Index">Class Schedule</a></li>
+                                    <li><a asp-controller="Customer" asp-action="Bookings">Bookings</a></li>
+                                    <li><a asp-controller="Customer" asp-action="BookSession">Book Session</a></li>
+                                    <li><a asp-controller="Customer" asp-action="Membership">Membership</a></li>
+                                    <li><a asp-controller="Customer" asp-action="MyBookings">My Bookings</a></li>
+                                    <li><a asp-controller="Customer" asp-action="Payments">Payments</a></li>
+                                    <li><a asp-controller="Customer" asp-action="SessionCalendar">Session Calendar</a></li>
+                                    <li><a asp-controller="Customer" asp-action="TrainerList">Trainer List</a></li>
                                 }
                             }
-
                             <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
                         </ul>
                     </nav>

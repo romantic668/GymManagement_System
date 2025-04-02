@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GymManagement.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialV2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,18 +70,21 @@ namespace GymManagement.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     JoinDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DOB = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
                     MembershipType = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     SubscriptionDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    MembershipStatus = table.Column<string>(type: "TEXT", nullable: true),
+                    MembershipExpiry = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    GymBranchId = table.Column<int>(type: "INTEGER", nullable: true),
                     Responsibilities = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     Notes = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     IsAvailable = table.Column<bool>(type: "INTEGER", nullable: true),
                     Receptionist_BranchId = table.Column<int>(type: "INTEGER", nullable: true),
-                    Receptionist_GymBranchBranchId = table.Column<int>(type: "INTEGER", nullable: true),
                     Specialization = table.Column<string>(type: "TEXT", nullable: true),
                     ExperienceStarted = table.Column<DateTime>(type: "TEXT", nullable: true),
                     BranchId = table.Column<int>(type: "INTEGER", nullable: true),
-                    GymBranchBranchId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Bio = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -101,15 +104,23 @@ namespace GymManagement.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_GymBranches_GymBranchBranchId",
-                        column: x => x.GymBranchBranchId,
+                        name: "FK_AspNetUsers_GymBranches_BranchId",
+                        column: x => x.BranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId");
+                        principalColumn: "BranchId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_GymBranches_Receptionist_GymBranchBranchId",
-                        column: x => x.Receptionist_GymBranchBranchId,
+                        name: "FK_AspNetUsers_GymBranches_GymBranchId",
+                        column: x => x.GymBranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId");
+                        principalColumn: "BranchId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_GymBranches_Receptionist_BranchId",
+                        column: x => x.Receptionist_BranchId,
+                        principalTable: "GymBranches",
+                        principalColumn: "BranchId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,17 +132,17 @@ namespace GymManagement.Migrations
                     RoomName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Capacity = table.Column<int>(type: "INTEGER", nullable: false),
                     IsAvailable = table.Column<bool>(type: "INTEGER", nullable: false),
-                    BranchId = table.Column<int>(type: "INTEGER", nullable: false),
-                    GymBranchBranchId = table.Column<int>(type: "INTEGER", nullable: true)
+                    BranchId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rooms", x => x.RoomId);
                     table.ForeignKey(
-                        name: "FK_Rooms_GymBranches_GymBranchBranchId",
-                        column: x => x.GymBranchBranchId,
+                        name: "FK_Rooms_GymBranches_BranchId",
+                        column: x => x.BranchId,
                         principalTable: "GymBranches",
-                        principalColumn: "BranchId");
+                        principalColumn: "BranchId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -270,6 +281,7 @@ namespace GymManagement.Migrations
                 {
                     SessionId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    SessionName = table.Column<string>(type: "TEXT", nullable: false),
                     SessionDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Capacity = table.Column<int>(type: "INTEGER", nullable: false),
                     GymClassId = table.Column<int>(type: "INTEGER", nullable: false),
@@ -311,6 +323,7 @@ namespace GymManagement.Migrations
                 {
                     BookingId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
                     BookingDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     CustomerId = table.Column<string>(type: "TEXT", nullable: false),
@@ -333,6 +346,12 @@ namespace GymManagement.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Bookings_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Bookings_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
@@ -345,17 +364,28 @@ namespace GymManagement.Migrations
                 columns: new[] { "BranchId", "Address", "BranchName", "ContactNumber" },
                 values: new object[,]
                 {
-                    { 1, "123 Main St", "Downtown Gym", "123-456-7890" },
-                    { 2, "456 High St", "Uptown Gym", "987-654-3210" }
+                    { 1, "101 Main St", "Downtown Gym", "555-1001" },
+                    { 2, "202 High St", "Uptown Gym", "555-2002" },
+                    { 3, "303 East Ave", "Eastside Gym", "555-3003" },
+                    { 4, "404 West Blvd", "Westside Gym", "555-4004" },
+                    { 5, "505 Central Rd", "Central Gym", "555-5005" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Rooms",
-                columns: new[] { "RoomId", "BranchId", "Capacity", "GymBranchBranchId", "IsAvailable", "RoomName" },
+                columns: new[] { "RoomId", "BranchId", "Capacity", "IsAvailable", "RoomName" },
                 values: new object[,]
                 {
-                    { 1, 1, 20, null, true, "Yoga Room" },
-                    { 2, 2, 30, null, true, "Weightlifting Room" }
+                    { 1, 1, 20, true, "Yoga Room" },
+                    { 2, 1, 25, true, "Cardio Room" },
+                    { 3, 2, 30, true, "Weight Room" },
+                    { 4, 2, 18, true, "Crossfit Zone" },
+                    { 5, 3, 15, true, "Spin Studio" },
+                    { 6, 3, 20, true, "Dance Studio" },
+                    { 7, 4, 12, true, "HIIT Area" },
+                    { 8, 4, 16, true, "Pilates Room" },
+                    { 9, 5, 10, true, "Stretch Zone" },
+                    { 10, 5, 22, true, "Functional Room" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -390,14 +420,19 @@ namespace GymManagement.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_GymBranchBranchId",
+                name: "IX_AspNetUsers_BranchId",
                 table: "AspNetUsers",
-                column: "GymBranchBranchId");
+                column: "BranchId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_Receptionist_GymBranchBranchId",
+                name: "IX_AspNetUsers_GymBranchId",
                 table: "AspNetUsers",
-                column: "Receptionist_GymBranchBranchId");
+                column: "GymBranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Receptionist_BranchId",
+                table: "AspNetUsers",
+                column: "Receptionist_BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -421,6 +456,11 @@ namespace GymManagement.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_UserId",
+                table: "Bookings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GymClasses_TrainerId",
                 table: "GymClasses",
                 column: "TrainerId");
@@ -431,9 +471,9 @@ namespace GymManagement.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_GymBranchBranchId",
+                name: "IX_Rooms_BranchId",
                 table: "Rooms",
-                column: "GymBranchBranchId");
+                column: "BranchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_GymClassId",

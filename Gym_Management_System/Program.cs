@@ -65,6 +65,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Admin}/{action=Dashboard}/{id?}");
+// Customer route configuration
+app.MapControllerRoute(
+    name: "customer",
+    pattern: "Customer/{action=Dashboard}/{id?}",
+    defaults: new { controller = "Customer" });
 
 // ✅ Default routing
 app.MapControllerRoute(

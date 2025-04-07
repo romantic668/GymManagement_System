@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
 using GymManagement.Data;
 using GymManagement.Models;
+using GymManagement.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,9 @@ builder.Services.AddAuthorization();
 
 // ✅ Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<UserService>();
+
 
 var app = builder.Build();
 

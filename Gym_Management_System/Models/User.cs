@@ -17,6 +17,7 @@ namespace GymManagement.Models
     [DataType(DataType.Date)]
     public DateTime? DOB { get; set; }
 
+
     [NotMapped] // 防止 EF 把 RoleNames 映射到数据库
     public IList<string>? RoleNames { get; set; }
   }

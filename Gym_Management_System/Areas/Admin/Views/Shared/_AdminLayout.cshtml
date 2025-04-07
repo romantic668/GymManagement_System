@@ -10,34 +10,30 @@
     var currentUser = await UserManager.GetUserAsync(User);
     var displayName = currentUser?.Name ?? User.Identity?.Name ?? "User";
 
-    // 🔁 获取当前用户的角色列表
     var roles = currentUser != null ? await UserManager.GetRolesAsync(currentUser) : new List<string>();
     bool isOnlyAdmin = roles.Count == 1 && roles.Contains("Admin");
 
-    // ✅ 决定跳转链接：如果只有 Admin 身份则跳 Home/Index，否则跳 Home/Dashboard 或其它身份主页
     string logoController = "Home";
-    string logoAction = "Index"; // 默认主页
+    string logoAction = "Index";
 
     if (!isOnlyAdmin)
     {
         if (roles.Contains("Trainer"))
         {
             logoController = "Trainer";
-            logoAction = "Dashboard"; // 🔁 对应 Trainer/Dashboard.cshtml
+            logoAction = "Dashboard";
         }
         else if (roles.Contains("Receptionist"))
         {
             logoController = "Receptionist";
-            logoAction = "ManageBookings"; // 🔁 你可以添加对应视图或已有视图
+            logoAction = "ManageBookings";
         }
         else if (roles.Contains("Customer"))
         {
             logoController = "Customer";
-            logoAction = "Dashboard"; // 🔁 对应 Customer/Dashboard.cshtml
+            logoAction = "Dashboard";
         }
     }
-
-
 }
 
 <!DOCTYPE html>
@@ -45,67 +41,102 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Admin Area - GymManagement</title>
+    <title>Admin Overview - GymManagement</title>
     <link href="~/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/css/style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+
+    <style>
+        html,
+        body {
+            background-color: #f3f4f6 !important;
+            color: #212529 !important;
+        }
+
+        .bg-sidebar {
+            background-color: #f3f4f6;
+        }
+
+        .bg-content {
+            background-color: #ffffff;
+        }
+    </style>
 </head>
 
-<body class="bg-dark text-white">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary px-4">
-        <!-- ✅ LOGO：根据角色数量动态跳转 -->
-        <a class="navbar-brand text-warning fw-bold" asp-area="" asp-controller="@logoController"
-            asp-action="@logoAction">
-            🏋️ GymAdmin
-        </a>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="bg-sidebar border-end vh-100 p-3" style="width: 250px;">
+            <div class="mb-4">
+                <div class="logo text-center mb-3">
+                    <a asp-area="" asp-controller="@logoController" asp-action="@logoAction">
+                        <img src="~/img/logo.png" alt="Gym Logo"
+                            style="filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.3));" />
+                    </a>
+                </div>
+            </div>
+            @{
+                string NavLinkClass(string ctrl, string act) =>
+                (currentController == ctrl && currentAction == act)
+                ? "nav-link text-dark fw-bold active bg-white rounded px-3 py-2 shadow-sm"
+                : "nav-link text-dark px-3 py-2";
+            }
 
-        <div class="collapse navbar-collapse d-flex justify-content-between">
-            <ul class="navbar-nav me-auto">
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link @(currentController == "Admin" && currentAction == "Dashboard" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                    <a class="@NavLinkClass("Admin", "Dashboard")" asp-area="Admin" asp-controller="Admin"
+                        asp-action="Dashboard">Overview</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentController == "User" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="User" asp-action="Index">Manage Users</a>
+                    <a class="@NavLinkClass("Admin", "ManageSessions")" asp-area="Admin" asp-controller="Admin"
+                        asp-action="ManageSessions">Create a session</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentAction == "ManageGymBranches" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="Admin" asp-action="ManageGymBranches">Manage Gym Branches</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentAction == "ManageMembers" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="Admin" asp-action="ManageMembers">Manage Members</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentAction == "ManageSessions" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="Admin" asp-action="ManageSessions">Manage Sessions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(currentAction == "ManageTrainers" ? "active fw-bold text-white" : "text-secondary")"
-                        asp-area="Admin" asp-controller="Admin" asp-action="ManageTrainers">Manage Trainers</a>
+                    <a class="@NavLinkClass("User", "Index")" asp-area="Admin" asp-controller="User"
+                        asp-action="Index">My employees</a>
                 </li>
             </ul>
-
-            @if (SignInManager.IsSignedIn(User))
-            {
-                <div class="d-flex align-items-center gap-3">
-                    <span class="text-white">Hello, @displayName!</span>
-                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-warning btn-sm">LOGOUT</button>
-                    </form>
-                </div>
-            }
         </div>
-    </nav>
 
-    <div class="container mt-4">
-        @RenderBody()
+        <!-- Main Content -->
+        <div class="bg-content flex-grow-1 p-4" style="overflow-x: auto;">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    @{
+                        string currentPageLabel = currentController switch
+                        {
+                            "Admin" when currentAction == "Dashboard" => "Overview",
+                            "Admin" when currentAction == "ManageSessions" => "Create a session",
+                            "User" when currentAction == "Index" => "My employees",
+                            _ => currentAction
+                        };
+                    }
+                    <h5 class="text-muted">Dashboard / <span class="text-dark">@currentPageLabel</span></h5>
+                </div>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-dark">Hello, @displayName!</span>
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">LOGOUT</button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            @RenderBody()
+        </div>
     </div>
 
-    @RenderSection("Scripts", required: false)
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 
 </html>

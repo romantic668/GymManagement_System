@@ -3,10 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymManagement.Models
 {
+
+  public enum SessionCategory
+  {
+    Yoga,
+    Pilates,
+    StrengthTraining,
+    Cardio,
+    HIIT,
+    DanceFitness,
+    Cycling
+  }
   public class Session
   {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int SessionId { get; set; }
+
 
     [Required]
     public string SessionName { get; set; } // 修改了数据类型
@@ -16,6 +29,9 @@ namespace GymManagement.Models
 
     [Required]
     public int Capacity { get; set; }
+
+    [Required]
+    public SessionCategory Category { get; set; }
 
     // 🔸 GymClass FK
     [Required]

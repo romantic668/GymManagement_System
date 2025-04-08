@@ -1,0 +1,65 @@
+@model GymManagement.Areas.Admin.Models.CreateSessionViewModel
+@{
+    ViewData["Title"] = "Create a session";
+    Layout = "../Shared/_AdminLayout.cshtml";
+}
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">Create a session</h2>
+
+    <form asp-action="CreateSession" asp-controller="Admin" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label">Session time</label>
+            <input asp-for="SessionDateTime" class="form-control" placeholder="ex: 09:30 / Apr 24, 2025" required />
+            <span asp-validation-for="SessionDateTime" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Gym class</label>
+            <select asp-for="GymClassId" asp-items="Model.GymClassList" class="form-select" required>
+                <option value="">Select</option>
+            </select>
+            <span asp-validation-for="GymClassId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Trainer</label>
+            <select asp-for="TrainerId" asp-items="Model.TrainerList" class="form-select" required>
+                <option value="">Select</option>
+            </select>
+            <span asp-validation-for="TrainerId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Branch</label>
+            <div class="form-control-plaintext">@Model.BranchName</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Room</label>
+            <select asp-for="RoomId" asp-items="Model.RoomList" class="form-select" required>
+                <option value="">Select</option>
+            </select>
+            <span asp-validation-for="RoomId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Capacity</label>
+            <input asp-for="Capacity" class="form-control" readonly />
+        </div>
+
+        <button type="submit" class="btn btn-dark">Save & Publish</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // auto-set capacity when room changes
+        document.querySelector('[name="RoomId"]').addEventListener('change', function () {
+            const selected = this.options[this.selectedIndex];
+            const capacity = selected.getAttribute('data-capacity');
+            if (capacity) document.querySelector('[name="Capacity"]').value = capacity;
+        });
+    </script>
+}

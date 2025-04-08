@@ -35,5 +35,12 @@ namespace GymManagement.Areas.Admin.Controllers
             }
             return Json(true);
         }
+
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> CheckEmailEdit(string contact, string id)
+        {
+            var user = await _userManager.FindByEmailAsync(contact);
+            return Json(user == null || user.Id == id ? true : $"The email '{contact}' is already registered by another user.");
+        }
     }
 }

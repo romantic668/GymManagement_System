@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GymManagement.Data;
 using GymManagement.Models;
+using GymManagement.Areas.Admin.Models;
 
 namespace GymManagement.Areas.Admin.Controllers
 {
   [Area("Admin")]
-  [Authorize(Roles = "Admin")] // Only Admin can access this controller
+  [Authorize(Roles = "Admin")]
   public class AdminController : Controller
   {
     private readonly AppDbContext _dbContext;
@@ -20,17 +22,102 @@ namespace GymManagement.Areas.Admin.Controllers
       _userManager = userManager;
     }
 
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard()
     {
-      var dashboardData = new AdminDashboardViewModel
+      var today = DateTime.Today;
+
+      var sessions = await _dbContext.Sessions
+          .Include(s => s.Trainer).ThenInclude(t => t.GymBranch)
+          .Include(s => s.Room)
+          .Include(s => s.GymClass)
+          .Where(s => s.SessionDateTime.Date >= today)
+          .ToListAsync();
+
+      var sessionsByDate = sessions
+          .GroupBy(s => s.SessionDateTime.Date)
+          .OrderBy(g => g.Key)
+          .ToDictionary(g => g.Key, g => g.ToList());
+
+      var viewModel = new AdminDashboardViewModel
       {
-        TotalMembers = _dbContext.Customers.Count(),
-        TotalTrainers = _dbContext.Trainers.Count(),
-        TotalSessions = _dbContext.Sessions.Count(),
-        TotalBranches = _dbContext.GymBranches.Count()
+        TotalSessions = await _dbContext.Sessions.CountAsync(),
+        TotalMembers = await _dbContext.Users.OfType<Customer>().CountAsync(),
+        TotalTrainers = await _dbContext.Users.OfType<Trainer>().CountAsync(),
+        TotalBranches = await _dbContext.GymBranches.CountAsync(),
+        UpcomingSessionsByDate = sessionsByDate
       };
 
-      return View(dashboardData);
+      return View(viewModel);
+    }
+
+    [HttpGet]
+    public IActionResult CreateSession()
+    {
+      var vm = new CreateSessionViewModel
+      {
+        GymClassList = _dbContext.GymClasses
+              .Select(c => new SelectListItem { Text = c.ClassName, Value = c.GymClassId.ToString() })
+              .ToList(),
+        TrainerList = _dbContext.Users
+              .OfType<Trainer>()
+              .Select(t => new SelectListItem { Text = t.Name, Value = t.Id })
+              .ToList(),
+        RoomList = _dbContext.Rooms
+              .Select(r => new SelectListItem { Text = r.RoomName, Value = r.RoomId.ToString() })
+              .ToList(),
+        BranchName = "Metro Branch"
+      };
+      return View(vm);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateSession(CreateSessionViewModel vm)
+    {
+      if (!ModelState.IsValid)
+      {
+        vm.GymClassList = _dbContext.GymClasses
+            .Select(c => new SelectListItem { Text = c.ClassName, Value = c.GymClassId.ToString() })
+            .ToList();
+        vm.TrainerList = _dbContext.Users
+            .OfType<Trainer>()
+            .Select(t => new SelectListItem { Text = t.Name, Value = t.Id })
+            .ToList();
+        vm.RoomList = _dbContext.Rooms
+            .Select(r => new SelectListItem { Text = r.RoomName, Value = r.RoomId.ToString() })
+            .ToList();
+        vm.BranchName = "Metro Branch";
+        return View(vm);
+      }
+
+      var currentUser = await _userManager.GetUserAsync(User);
+      if (currentUser == null)
+      {
+        return Forbid();
+      }
+
+      var session = new Session
+      {
+        SessionDateTime = vm.SessionDateTime,
+        GymClassId = vm.GymClassId,
+        TrainerId = vm.TrainerId,
+        RoomId = vm.RoomId,
+        Capacity = vm.Capacity,
+        ReceptionistId = currentUser.Id
+      };
+
+      _dbContext.Sessions.Add(session);
+      await _dbContext.SaveChangesAsync();
+      return RedirectToAction("Dashboard");
+    }
+
+    [HttpGet]
+    public IActionResult GetRoomCapacity(int roomId)
+    {
+      var capacity = _dbContext.Rooms.Where(r => r.RoomId == roomId)
+          .Select(r => r.Capacity)
+          .FirstOrDefault();
+
+      return Json(new { capacity });
     }
 
     public IActionResult ManageMembers()

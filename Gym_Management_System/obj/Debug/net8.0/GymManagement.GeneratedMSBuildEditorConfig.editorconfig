@@ -28,6 +28,10 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/cong_/Gym_Management_System/Gym_Management_System/Areas/Admin/Views/Admin/CreateSession.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQWRtaW5cQ3JlYXRlU2Vzc2lvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/cong_/Gym_Management_System/Gym_Management_System/Areas/Admin/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

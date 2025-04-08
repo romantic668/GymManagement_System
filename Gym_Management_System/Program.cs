@@ -5,17 +5,13 @@ using GymManagement.Data;
 using GymManagement.Models;
 using GymManagement.Services;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Register MVC
+// ✅ Register services
 builder.Services.AddControllersWithViews();
-
-// ✅ Register DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ Register Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
   options.Password.RequireDigit = true;
@@ -27,14 +23,12 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// ✅ Configure cookie settings (AccessDenied path)
 builder.Services.ConfigureApplicationCookie(options =>
 {
   options.LoginPath = "/Account/Login";
-  options.AccessDeniedPath = "/Account/AccessDenied"; // 👈 Add this line
+  options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-// ✅ Register Google Authentication
 builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
@@ -44,15 +38,27 @@ builder.Services.AddAuthentication()
     });
 
 builder.Services.AddAuthorization();
-
-// ✅ Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddScoped<UserService>();
-
 
 var app = builder.Build();
 
+if (args.Length > 0 && args[0].ToLower() == "seeddata")
+{
+  bool clearSessions = args.Contains("--clearsessions");
+
+  using var scope = app.Services.CreateScope();
+  var services = scope.ServiceProvider;
+
+  await SeedUsers.InitializeAsync(services);
+  await SeedSessions.InitializeAsync(services, clearBeforeSeed: clearSessions);
+
+  Console.WriteLine($"✅ Seeding completed {(clearSessions ? "with session cleanup" : "without session cleanup")}.");
+  return;
+}
+
+
+// ✅ Web app setup
 if (!app.Environment.IsDevelopment())
 {
   app.UseExceptionHandler("/Home/Error");
@@ -61,31 +67,22 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ✅ Area routing - must come BEFORE default
+// ✅ Routes
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Admin}/{action=Dashboard}/{id?}");
-// Customer route configuration
+
 app.MapControllerRoute(
     name: "customer",
     pattern: "Customer/{action=Dashboard}/{id?}",
     defaults: new { controller = "Customer" });
 
-// ✅ Default routing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// ✅ Seed roles/users
-using (var scope = app.Services.CreateScope())
-{
-  var services = scope.ServiceProvider;
-  await SeedData.InitializeAsync(services);
-}
 
 app.Run();

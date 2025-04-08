@@ -268,13 +268,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\GymManagement.uow97ne261.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"949"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE=\u0022"},{"Name":"Last-Modified","Value":"Thu, 03 Apr 2025 20:10:30 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"949"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Apr 2025 14:00:40 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/GymManagement/GymManagement.uow97ne261.bundle.scp.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\GymManagement.uow97ne261.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"uow97ne261"},{"Name":"integrity","Value":"sha256-vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE="},{"Name":"label","Value":"_content/GymManagement/GymManagement.bundle.scp.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"949"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE=\u0022"},{"Name":"Last-Modified","Value":"Thu, 03 Apr 2025 20:10:30 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"949"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022vpD4mpGeXyt0Jyt4AuBsoR2sh\u002B0Qgzdj9y9DdCnRasE=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Apr 2025 14:00:40 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/GymManagement/img/about-us.biszweseq2.jpg">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\img\about-us.jpg'))</AssetFile>

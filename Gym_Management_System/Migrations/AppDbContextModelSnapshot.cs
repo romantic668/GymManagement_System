@@ -211,81 +211,201 @@ namespace GymManagement.Migrations
                         {
                             RoomId = 1,
                             BranchId = 1,
-                            Capacity = 20,
+                            Capacity = 44,
                             IsAvailable = true,
-                            RoomName = "Yoga Room"
+                            RoomName = "Recovery Room"
                         },
                         new
                         {
                             RoomId = 2,
                             BranchId = 1,
-                            Capacity = 25,
+                            Capacity = 21,
                             IsAvailable = true,
-                            RoomName = "Cardio Room"
+                            RoomName = "Mobility Area"
                         },
                         new
                         {
                             RoomId = 3,
-                            BranchId = 2,
-                            Capacity = 30,
+                            BranchId = 1,
+                            Capacity = 35,
                             IsAvailable = true,
-                            RoomName = "Weight Room"
+                            RoomName = "Endurance Zone"
                         },
                         new
                         {
                             RoomId = 4,
-                            BranchId = 2,
-                            Capacity = 18,
+                            BranchId = 1,
+                            Capacity = 32,
                             IsAvailable = true,
-                            RoomName = "Crossfit Zone"
+                            RoomName = "Functional Room"
                         },
                         new
                         {
                             RoomId = 5,
-                            BranchId = 3,
-                            Capacity = 15,
-                            IsAvailable = true,
-                            RoomName = "Spin Studio"
-                        },
-                        new
-                        {
-                            RoomId = 6,
-                            BranchId = 3,
-                            Capacity = 20,
+                            BranchId = 1,
+                            Capacity = 47,
                             IsAvailable = true,
                             RoomName = "Dance Studio"
                         },
                         new
                         {
-                            RoomId = 7,
-                            BranchId = 4,
-                            Capacity = 12,
+                            RoomId = 6,
+                            BranchId = 2,
+                            Capacity = 40,
                             IsAvailable = true,
-                            RoomName = "HIIT Area"
+                            RoomName = "Endurance Zone"
+                        },
+                        new
+                        {
+                            RoomId = 7,
+                            BranchId = 2,
+                            Capacity = 30,
+                            IsAvailable = true,
+                            RoomName = "Spin Studio"
                         },
                         new
                         {
                             RoomId = 8,
-                            BranchId = 4,
-                            Capacity = 16,
+                            BranchId = 2,
+                            Capacity = 40,
                             IsAvailable = true,
-                            RoomName = "Pilates Room"
+                            RoomName = "Cardio Room"
                         },
                         new
                         {
                             RoomId = 9,
-                            BranchId = 5,
-                            Capacity = 10,
+                            BranchId = 2,
+                            Capacity = 49,
+                            IsAvailable = true,
+                            RoomName = "Dance Studio"
+                        },
+                        new
+                        {
+                            RoomId = 10,
+                            BranchId = 2,
+                            Capacity = 33,
+                            IsAvailable = true,
+                            RoomName = "Strength Studio"
+                        },
+                        new
+                        {
+                            RoomId = 11,
+                            BranchId = 3,
+                            Capacity = 48,
                             IsAvailable = true,
                             RoomName = "Stretch Zone"
                         },
                         new
                         {
-                            RoomId = 10,
-                            BranchId = 5,
-                            Capacity = 22,
+                            RoomId = 12,
+                            BranchId = 3,
+                            Capacity = 20,
+                            IsAvailable = true,
+                            RoomName = "Crossfit Zone"
+                        },
+                        new
+                        {
+                            RoomId = 13,
+                            BranchId = 3,
+                            Capacity = 36,
+                            IsAvailable = true,
+                            RoomName = "Cardio Room"
+                        },
+                        new
+                        {
+                            RoomId = 14,
+                            BranchId = 3,
+                            Capacity = 32,
+                            IsAvailable = true,
+                            RoomName = "Strength Studio"
+                        },
+                        new
+                        {
+                            RoomId = 15,
+                            BranchId = 3,
+                            Capacity = 26,
                             IsAvailable = true,
                             RoomName = "Functional Room"
+                        },
+                        new
+                        {
+                            RoomId = 16,
+                            BranchId = 4,
+                            Capacity = 49,
+                            IsAvailable = true,
+                            RoomName = "HIIT Area"
+                        },
+                        new
+                        {
+                            RoomId = 17,
+                            BranchId = 4,
+                            Capacity = 29,
+                            IsAvailable = true,
+                            RoomName = "Dance Studio"
+                        },
+                        new
+                        {
+                            RoomId = 18,
+                            BranchId = 4,
+                            Capacity = 39,
+                            IsAvailable = true,
+                            RoomName = "Mobility Area"
+                        },
+                        new
+                        {
+                            RoomId = 19,
+                            BranchId = 4,
+                            Capacity = 45,
+                            IsAvailable = true,
+                            RoomName = "Yoga Room"
+                        },
+                        new
+                        {
+                            RoomId = 20,
+                            BranchId = 4,
+                            Capacity = 50,
+                            IsAvailable = true,
+                            RoomName = "Stretch Zone"
+                        },
+                        new
+                        {
+                            RoomId = 21,
+                            BranchId = 5,
+                            Capacity = 41,
+                            IsAvailable = true,
+                            RoomName = "Cardio Room"
+                        },
+                        new
+                        {
+                            RoomId = 22,
+                            BranchId = 5,
+                            Capacity = 24,
+                            IsAvailable = true,
+                            RoomName = "Weight Room"
+                        },
+                        new
+                        {
+                            RoomId = 23,
+                            BranchId = 5,
+                            Capacity = 29,
+                            IsAvailable = true,
+                            RoomName = "Mobility Area"
+                        },
+                        new
+                        {
+                            RoomId = 24,
+                            BranchId = 5,
+                            Capacity = 44,
+                            IsAvailable = true,
+                            RoomName = "Recovery Room"
+                        },
+                        new
+                        {
+                            RoomId = 25,
+                            BranchId = 5,
+                            Capacity = 42,
+                            IsAvailable = true,
+                            RoomName = "Endurance Zone"
                         });
                 });
 
@@ -296,6 +416,9 @@ namespace GymManagement.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Category")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GymClassId")

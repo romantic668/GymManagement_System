@@ -153,6 +153,26 @@
       "PackagePath": "staticwebassets\\img\\blog\\details\\quote-left.png"
     },
     {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\branches\\branch1.png",
+      "PackagePath": "staticwebassets\\img\\branches\\branch1.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\branches\\branch2.png",
+      "PackagePath": "staticwebassets\\img\\branches\\branch2.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\branches\\branch3.png",
+      "PackagePath": "staticwebassets\\img\\branches\\branch3.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\branches\\branch4.png",
+      "PackagePath": "staticwebassets\\img\\branches\\branch4.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\branches\\branch5.png",
+      "PackagePath": "staticwebassets\\img\\branches\\branch5.png"
+    },
+    {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\img\\breadcrumb-bg.jpg",
       "PackagePath": "staticwebassets\\img\\breadcrumb-bg.jpg"
     },

@@ -153,5 +153,13 @@ span.field-validation-error {
   color: #dc3545;
 }
 
+/* site.css 或 layout 页尾添加 */
+.btn-outline-light:hover,
+.btn-outline-light:focus,
+.btn-outline-light:active {
+  color: #000 !important;
+  background-color: #fff !important;
+  border-color: #fff !important;
+}
 
 /*# sourceMappingURL=site.css.map */

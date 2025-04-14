@@ -30,13 +30,28 @@ namespace GymManagement.Areas.Admin.Controllers
           .Include(s => s.Trainer).ThenInclude(t => t.GymBranch)
           .Include(s => s.Room)
           .Include(s => s.GymClass)
+          .Include(s => s.Bookings)
           .Where(s => s.SessionDateTime.Date >= today)
           .ToListAsync();
 
       var sessionsByDate = sessions
           .GroupBy(s => s.SessionDateTime.Date)
           .OrderBy(g => g.Key)
-          .ToDictionary(g => g.Key, g => g.ToList());
+          .ToDictionary(
+              g => g.Key,
+              g => g.Select(s => new Session
+              {
+                SessionId = s.SessionId,
+                SessionName = s.SessionName,
+                SessionDateTime = s.SessionDateTime,
+                Trainer = s.Trainer,
+                Room = s.Room,
+                GymClass = s.GymClass,
+                Category = s.Category,
+                Capacity = s.Capacity,
+                Bookings = s.Bookings
+              }).ToList()
+          );
 
       var viewModel = new AdminDashboardViewModel
       {
@@ -49,6 +64,7 @@ namespace GymManagement.Areas.Admin.Controllers
 
       return View(viewModel);
     }
+
 
     [HttpGet]
     public IActionResult CreateSession(DateTime? date)

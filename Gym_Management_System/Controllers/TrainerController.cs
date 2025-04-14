@@ -20,27 +20,57 @@ namespace GymManagement.Controllers
     }
 
     // 🔹 教练仪表盘
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard()
     {
-      string? trainerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-      if (string.IsNullOrEmpty(trainerId))
+      var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+      var today = DateTime.Today;
+
+      var sessions = _dbContext.Sessions
+          .Include(s => s.GymClass)
+          .Include(s => s.Room)
+          .Include(s => s.Bookings)
+          .Where(s => s.TrainerId == userId)
+          .ToList();
+
+      var gymClasses = _dbContext.GymClasses
+          .Where(c => c.TrainerId == userId)
+          .ToList();
+
+      var model = new TrainerDashboardViewModel
       {
-        return BadRequest("Invalid trainer identifier.");
-      }
+        TotalSessions = sessions.Count,
+        TodaySessionsCount = sessions.Count(s => s.SessionDateTime.Date == today),
+        UpcomingSessions = sessions
+              .Where(s => s.SessionDateTime >= today)
+              .OrderBy(s => s.SessionDateTime)
+              .Take(10)
+              .ToList(),
+        TotalGymClasses = gymClasses.Count
+      };
 
-      var trainer = _dbContext.Trainers
-          .Include(t => t.GymClasses)
-          .Include(t => t.Sessions)
-          .FirstOrDefault(t => t.Id == trainerId);
-
-      if (trainer == null)
-      {
-        return NotFound("Trainer not found.");
-      }
-
-      return View(trainer);
-
+      return View(model);
     }
+
+    [HttpPost]
+    public IActionResult CreateGymClass(string ClassName, int Duration, SessionCategory Category, string Description)
+    {
+      var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      var gymClass = new GymClass
+      {
+        ClassName = ClassName,
+        Duration = Duration,
+        Description = Description,
+        TrainerId = userId,
+        AvailableTime = DateTime.Today
+      };
+
+      _dbContext.GymClasses.Add(gymClass);
+      _dbContext.SaveChanges();
+
+      return RedirectToAction("Dashboard");
+    }
+
 
     // 🔹 查看教练安排的课程
     public IActionResult ViewSessions()

@@ -12,7 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 // ✅ Register services
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+  options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+  options.EnableSensitiveDataLogging(); // 🔍 显示 SQL 参数，调试 LINQ 异常
+});
+
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -29,7 +33,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
   options.LoginPath = "/Account/Login";
   options.AccessDeniedPath = "/Account/AccessDenied";
+  options.ExpireTimeSpan = TimeSpan.FromDays(14); // <-- 关键点！
+  options.SlidingExpiration = true;               // 可选，刷新时自动续命
+  options.Cookie.IsEssential = true;              // 确保不会被阻止
 });
+
 
 builder.Services.AddAuthentication()
     .AddGoogle(options =>

@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +16,13 @@ namespace GymManagement.Data
 
             await context.Database.EnsureCreatedAsync();
 
-            // Clear sessions + gym classes if needed
             if (clearBeforeSeed)
             {
-                var sessionCount = context.Sessions.Count();
-                var classCount = context.GymClasses.Count();
-
+                context.Bookings.RemoveRange(context.Bookings);
                 context.Sessions.RemoveRange(context.Sessions);
                 context.GymClasses.RemoveRange(context.GymClasses);
                 await context.SaveChangesAsync();
-
-                Console.WriteLine($"🧹 Cleared {sessionCount} sessions and {classCount} gym classes");
+                Console.WriteLine("🧹 Cleared sessions, gym classes and bookings.");
             }
 
             string[] roles = { "Admin", "Trainer", "Receptionist", "Customer" };
@@ -42,14 +39,15 @@ namespace GymManagement.Data
 
             var trainerMap = context.Users.OfType<Trainer>().ToDictionary(t => t.Name, t => t.Id);
             var receptionistMap = context.Users.OfType<Receptionist>().ToDictionary(r => r.Name, r => r.Id);
+            var customerMap = context.Users.OfType<Customer>().ToDictionary(c => c.Name, c => c.Id);
 
-            if (trainerMap.Count == 0 || receptionistMap.Count == 0)
+            if (trainerMap.Count == 0 || receptionistMap.Count == 0 || customerMap.Count == 0)
             {
-                Console.WriteLine("❌ No Trainer or Receptionist found. Please run SeedUsers first.");
+                Console.WriteLine("❌ Trainer, Receptionist, or Customer not found. Please seed users first.");
                 return;
             }
 
-            // ✅ Always re-seed GymClasses
+            // Insert GymClasses
             {
                 var gymClasses = new List<GymClass>();
                 var random = new Random();
@@ -68,7 +66,7 @@ namespace GymManagement.Data
                     "Endurance Challenge"
                 };
 
-                string[] classDescriptions = {
+                string[] descriptions = {
                     "A calming yoga class that enhances flexibility and relaxation.",
                     "Focuses on core strength and posture improvement.",
                     "Targets the entire body to build balanced strength.",
@@ -88,7 +86,7 @@ namespace GymManagement.Data
                         ClassName = classNames[i],
                         AvailableTime = DateTime.Today.AddDays(i),
                         Duration = random.Next(30, 120),
-                        Description = classDescriptions[i],
+                        Description = descriptions[i],
                         TrainerId = trainerIds[i % trainerIds.Count]
                     });
                 }
@@ -98,24 +96,21 @@ namespace GymManagement.Data
                 Console.WriteLine("✅ Inserted 10 updated gym classes.");
             }
 
-            var gymClassIds = context.GymClasses.Select(c => c.GymClassId).Take(10).ToList();
-            var roomIds = context.Rooms.Select(r => r.RoomId).Take(30).ToList();
-
-            string[] names = trainerMap.Keys.Take(30).ToArray();
-            string[] receptionistNames = receptionistMap.Keys.Take(30).ToArray();
-            var rand = new Random();
+            var gymClassIds = context.GymClasses.Select(c => c.GymClassId).ToList();
+            var roomIds = context.Rooms.Select(r => r.RoomId).ToList();
             var sessionCategories = Enum.GetValues<SessionCategory>();
+            var rand = new Random();
 
-            var sessionNames = new[]
-            {
+            var sessionNames = new[] {
                 "Power Yoga", "Core Crusher", "Full Body Burn", "Spin & Sweat",
                 "Strength Surge", "Cardio Blaze", "Mobility Flow", "Endurance Engine",
                 "Flex Fusion", "Zen Stretch", "HIIT Riot", "Bootcamp Blast",
                 "Core Revival", "Pulse Ride", "Iron Circuit", "Balance Burn"
             };
 
-            var sessionDays = 7;
-            var sessionsPerDay = 6;
+            int sessionDays = 10;
+            int sessionsPerDay = 6;
+            var sessions = new List<Session>();
 
             for (int dayOffset = 0; dayOffset < sessionDays; dayOffset++)
             {
@@ -126,9 +121,8 @@ namespace GymManagement.Data
                 {
                     var index = (dayOffset * sessionsPerDay + j);
 
-                    var trainerName = names[index % names.Length];
-                    var receptionistName = receptionistNames[index % receptionistNames.Length];
-
+                    var trainerName = trainerMap.Keys.ElementAt(index % trainerMap.Count);
+                    var receptionistName = receptionistMap.Keys.ElementAt(index % receptionistMap.Count);
                     var sessionDate = date.AddHours(9 + (j % 4) * 2);
                     var roomId = roomIds[index % roomIds.Count];
 
@@ -146,15 +140,54 @@ namespace GymManagement.Data
                             GymClassId = gymClassIds[index % gymClassIds.Count],
                             RoomId = roomId,
                             TrainerId = trainerMap[trainerName],
-                            ReceptionistId = receptionistMap[receptionistName].ToString()
+                            ReceptionistId = receptionistMap[receptionistName]
                         };
+
                         context.Sessions.Add(session);
+                        sessions.Add(session);
                     }
                 }
             }
 
             await context.SaveChangesAsync();
-            Console.WriteLine("✅ Seeding completed.");
+            Console.WriteLine($"✅ Seeded {sessions.Count} sessions.");
+
+            var customers = customerMap.Values.ToList();
+            var receptionists = receptionistMap.Values.ToList();
+            var sessionList = context.Sessions.Include(s => s.Bookings).ToList();
+            int bookingCount = 0;
+
+            foreach (var session in sessionList)
+            {
+                int capacity = session.Capacity;
+                var selectedCustomers = customers.OrderBy(_ => rand.Next()).Take(rand.Next(capacity - 3, capacity + 1)).ToList();
+
+                foreach (var customerId in selectedCustomers)
+                {
+                    bool alreadyBooked = session.Bookings.Any(b => b.CustomerId == customerId);
+                    if (alreadyBooked) continue;
+
+                    var status = (BookingStatus)rand.Next(0, 4);
+                    var booking = new Booking
+                    {
+                        BookingDate = session.SessionDateTime.AddDays(-rand.Next(1, 5)),
+                        Status = status,
+                        CustomerId = customerId,
+                        SessionId = session.SessionId,
+                        UserId = customerId,
+                        ReceptionistId = receptionists[rand.Next(receptionists.Count)],
+                        CheckInTime = status == BookingStatus.CheckedIn
+                            ? session.SessionDateTime.AddMinutes(-rand.Next(5, 15))
+                            : null
+                    };
+
+                    context.Bookings.Add(booking);
+                    bookingCount++;
+                }
+            }
+
+            await context.SaveChangesAsync();
+            Console.WriteLine($"✅ Seeded {bookingCount} bookings.");
         }
     }
 }

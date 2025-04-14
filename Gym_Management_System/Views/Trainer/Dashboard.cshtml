@@ -1,0 +1,90 @@
+@model GymManagement.ViewModels.TrainerDashboardViewModel
+@{
+    ViewData["Title"] = "Trainer Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="breadcrumb-section set-bg" data-setbg="~/img/breadcrumb-bg.jpg">
+    <div class="container text-center">
+        <div class="breadcrumb-text">
+            <h2>Trainer Dashboard</h2>
+        </div>
+    </div>
+</section>
+
+<section class="services-section spad">
+    <div class="container">
+
+        <div class="row text-white mb-5">
+            <div class="col-md-4">
+                <div class="bg-dark p-4 text-center rounded">
+                    <h5>Total Sessions</h5>
+                    <h2>@Model.TotalSessions</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-primary p-4 text-center rounded">
+                    <h5>Today's Sessions</h5>
+                    <h2>@Model.TodaySessionsCount</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-success p-4 text-center rounded">
+                    <h5>Gym Classes Created</h5>
+                    <h2>@Model.TotalGymClasses</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title text-center">
+            <h3>Upcoming Sessions</h3>
+        </div>
+
+        <table class="table table-bordered table-striped bg-white text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Class</th>
+                    <th>Time</th>
+                    <th>Room</th>
+                    <th>Capacity</th>
+                    <th>Bookings</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.UpcomingSessions)
+                {
+                    <tr>
+                        <td>@s.GymClass.ClassName</td>
+                        <td>@s.SessionDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@s.Room.RoomName</td>
+                        <td>@s.Capacity</td>
+                        <td>@s.Bookings.Count</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="section-title text-center mt-5">
+            <h3>Create a Gym Class</h3>
+        </div>
+
+        <form asp-action="CreateGymClass" method="post">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <input name="ClassName" class="form-control" placeholder="Class Name" required />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <input name="Duration" type="number" min="15" class="form-control" placeholder="Duration (minutes)"
+                        required />
+                </div>
+
+                <div class="col-12 mb-3">
+                    <textarea name="Description" class="form-control" rows="2" placeholder="Description"></textarea>
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-success px-5" type="submit">Create Class</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>

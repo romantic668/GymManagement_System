@@ -200,8 +200,10 @@
                             <td>@s.Trainer?.GymBranch?.BranchName</td>
                             <td>@s.Room?.RoomName</td>
                             <td>@s.Capacity</td>
-                            <td>0</td>
-                            <td>0</td>
+                            <td>@s.Bookings.Count</td>
+                            <td>@s.Bookings.Count(b => b.Status != BookingStatus.Pending && b.Status != BookingStatus.Canceled)
+                            </td>
+
                         </tr>
                     }
                 </tbody>

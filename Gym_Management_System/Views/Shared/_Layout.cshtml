@@ -111,14 +111,7 @@
                                     <a asp-controller="GymBranch" asp-action="Index">Gym Branches</a>
                                 </li>
 
-                                <li class="@(currentController == "ClassSchedule" ? "active" : "")">
-                                    <a asp-controller="ClassSchedule" asp-action="Index">Classes</a>
-                                </li>
 
-                                <li
-                                    class="@(currentController == "Trainer" && currentAction == "ViewSessions" ? "active" : "")">
-                                    <a asp-controller="Trainer" asp-action="ViewSessions">Trainers</a>
-                                </li>
 
 
                             }

@@ -2,7 +2,7 @@
   "Files": [
     {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\GymManagement.bundle.scp.css",
-      "PackagePath": "staticwebassets\\GymManagement.uow97ne261.bundle.scp.css"
+      "PackagePath": "staticwebassets\\GymManagement.uj87xq1iza.bundle.scp.css"
     },
     {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\css\\barfiller.css",
@@ -1267,6 +1267,18 @@
     {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\scss\\site.scss",
       "PackagePath": "staticwebassets\\scss\\site.scss"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\5655084d-8a31-4c6a-808a-0af9a5845fcd.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profile\\5655084d-8a31-4c6a-808a-0af9a5845fcd.jpg"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\5aa77f1f-4f94-4632-8340-5b984ba395a0.png",
+      "PackagePath": "staticwebassets\\uploads\\profile\\5aa77f1f-4f94-4632-8340-5b984ba395a0.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\default.png",
+      "PackagePath": "staticwebassets\\uploads\\profile\\default.png"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GymManagement.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",

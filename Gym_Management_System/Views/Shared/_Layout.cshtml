@@ -9,6 +9,8 @@
     var isAdminOnly = isSignedIn && User.IsInRole("Admin")
     && !(User.IsInRole("Trainer") || User.IsInRole("Receptionist") || User.IsInRole("Customer"));
     var showGuestMenu = !isSignedIn || isAdminOnly;
+    var currentController = Context.Request.RouteValues["controller"]?.ToString();
+    var currentAction = Context.Request.RouteValues["action"]?.ToString();
 }
 
 <!DOCTYPE html>
@@ -99,10 +101,27 @@
                 <div class="col-lg-6">
                     <nav class="nav-menu">
                         <ul>
-                            <li class="@(Context.Request.Path == "/" ? "active" : "")">
-                                <a asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li><a asp-controller="GymBranch" asp-action="Index">Gym Branches</a></li>
+                            @if (showGuestMenu)
+                            {
+                                <li class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")">
+                                    <a asp-controller="Home" asp-action="Index">Home</a>
+                                </li>
+
+                                <li class="@(currentController == "GymBranch" ? "active" : "")">
+                                    <a asp-controller="GymBranch" asp-action="Index">Gym Branches</a>
+                                </li>
+
+                                <li class="@(currentController == "ClassSchedule" ? "active" : "")">
+                                    <a asp-controller="ClassSchedule" asp-action="Index">Classes</a>
+                                </li>
+
+                                <li
+                                    class="@(currentController == "Trainer" && currentAction == "ViewSessions" ? "active" : "")">
+                                    <a asp-controller="Trainer" asp-action="ViewSessions">Trainers</a>
+                                </li>
+
+
+                            }
 
                             @if (!showGuestMenu)
                             {
@@ -131,7 +150,9 @@
                                     <li><a asp-controller="Customer" asp-action="TrainerList">Trainer List</a></li>
                                 }
                             }
-                            <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                            <li class="@(currentController == "Home" && currentAction == "Contact" ? "active" : "")">
+                                <a asp-controller="Home" asp-action="Contact">Contact</a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -165,11 +186,12 @@
     <!-- Header End -->
 
     <!-- Main Body -->
-    <main role="main" class="py-4">
-        <div class="container-fluid">
-            @RenderBody()
-        </div>
+    <main role="main" class="mt-0 pt-0">
+        @RenderSection("PagePadding", required: false)
+        @RenderBody()
     </main>
+
+
 
     <!-- Footer Section -->
     <footer class="footer-section">

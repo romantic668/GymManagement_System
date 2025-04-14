@@ -32,6 +32,33 @@
 /* Template default CSS
 /*----------------------------------------*/
 
+.custom-pagination .page-link {
+	background-color: #1a1a1a;
+	color: #ff6600;
+	border: 1px solid #333;
+	border-radius: 30px;
+	margin: 0 4px;
+	transition: all 0.3s ease-in-out;
+	font-weight: 600;
+}
+
+.custom-pagination .page-link:hover {
+	background-color: #ff6600;
+	color: #000;
+	box-shadow: 0 0 10px #ff6600aa;
+}
+
+.custom-pagination .active .page-link {
+	background-color: #ff6600;
+	border-color: #ff6600;
+	color: #000;
+	box-shadow: 0 0 12px #ff6600cc;
+}
+
+
+
+
+
 html,
 body {
 	height: 100%;

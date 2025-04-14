@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.Google;
 using GymManagement.Data;
 using GymManagement.Models;
 using GymManagement.Services;
+using Microsoft.Extensions.FileProviders;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,8 +67,25 @@ if (!app.Environment.IsDevelopment())
   app.UseHsts();
 }
 
+
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// ✅ Add static file access for profile uploads + disable cache
+app.UseStaticFiles(new StaticFileOptions
+{
+  FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "uploads", "profile")),
+  RequestPath = "/uploads/profile",
+  OnPrepareResponse = ctx =>
+  {
+    ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+    ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+    ctx.Context.Response.Headers.Append("Expires", "0");
+  }
+});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

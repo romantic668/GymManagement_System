@@ -51,28 +51,54 @@ namespace GymManagement.Areas.Admin.Controllers
     }
 
     [HttpGet]
-    public IActionResult CreateSession()
+    public IActionResult CreateSession(DateTime? date)
     {
       var vm = new CreateSessionViewModel
       {
+        // ✅ If a date is provided, default time is 09:00 AM that day; otherwise empty
+        SessionDateTime = date.HasValue ? date.Value.Date.AddHours(9) : DateTime.MinValue,
+
+        // ✅ Dropdown: Gym class templates
         GymClassList = _dbContext.GymClasses
               .Select(c => new SelectListItem { Text = c.ClassName, Value = c.GymClassId.ToString() })
               .ToList(),
+
+        // ✅ Dropdown: Trainers
         TrainerList = _dbContext.Users
               .OfType<Trainer>()
               .Select(t => new SelectListItem { Text = t.Name, Value = t.Id })
               .ToList(),
+
+        // ✅ Dropdown: Rooms
         RoomList = _dbContext.Rooms
               .Select(r => new SelectListItem { Text = r.RoomName, Value = r.RoomId.ToString() })
               .ToList(),
-        BranchName = "Metro Branch"
+
+        // ✅ Dropdown: Session categories (e.g. Yoga, HIIT)
+        CategoryList = Enum.GetValues(typeof(SessionCategory))
+              .Cast<SessionCategory>()
+              .Select(c => new SelectListItem
+              {
+                Text = c.ToString(),
+                Value = c.ToString()
+              }).ToList(),
+
+        // ✅ Default branch label (readonly field)
+        BranchName = "N/A"
       };
+
       return View(vm);
     }
+
 
     [HttpPost]
     public async Task<IActionResult> CreateSession(CreateSessionViewModel vm)
     {
+      if (vm.SessionDateTime <= DateTime.Now)
+      {
+        ModelState.AddModelError("SessionDateTime", "Session time must be in the future.");
+      }
+
       if (!ModelState.IsValid)
       {
         vm.GymClassList = _dbContext.GymClasses
@@ -85,7 +111,14 @@ namespace GymManagement.Areas.Admin.Controllers
         vm.RoomList = _dbContext.Rooms
             .Select(r => new SelectListItem { Text = r.RoomName, Value = r.RoomId.ToString() })
             .ToList();
-        vm.BranchName = "Metro Branch";
+        vm.CategoryList = Enum.GetValues(typeof(SessionCategory))
+            .Cast<SessionCategory>()
+            .Select(c => new SelectListItem
+            {
+              Text = c.ToString(),
+              Value = c.ToString()
+            }).ToList();
+        vm.BranchName = null;
         return View(vm);
       }
 
@@ -102,6 +135,8 @@ namespace GymManagement.Areas.Admin.Controllers
         TrainerId = vm.TrainerId,
         RoomId = vm.RoomId,
         Capacity = vm.Capacity,
+        Category = vm.Category,
+        SessionName = vm.SessionName,
         ReceptionistId = currentUser.Id
       };
 
@@ -187,5 +222,50 @@ namespace GymManagement.Areas.Admin.Controllers
       bool isCustomer = await _userManager.IsInRoleAsync(user, "Customer");
       return RedirectToAction(isCustomer ? "ManageMembers" : "ManageTrainers");
     }
+
+    [HttpGet]
+    public IActionResult GetTrainerBranch(string trainerId)
+    {
+      var branch = _dbContext.Users
+          .OfType<Trainer>()
+          .Include(t => t.GymBranch)
+          .Where(t => t.Id == trainerId)
+          .Select(t => t.GymBranch != null ? t.GymBranch.BranchName : "Unknown")
+          .FirstOrDefault();
+
+      return Json(new { branch });
+    }
+
+    [HttpGet]
+    public IActionResult GetTrainersByClass(int gymClassId)
+    {
+      var trainers = _dbContext.GymClasses
+          .Where(c => c.GymClassId == gymClassId)
+          .Select(c => c.Trainer)
+          .Distinct()
+          .Select(t => new { t.Id, t.Name })
+          .ToList();
+
+      return Json(trainers);
+    }
+
+    [HttpGet]
+    public IActionResult GetRoomsByTrainer(string trainerId)
+    {
+      var branchId = _dbContext.Users
+          .OfType<Trainer>()
+          .Where(t => t.Id == trainerId)
+          .Select(t => t.BranchId)
+          .FirstOrDefault();
+
+      var rooms = _dbContext.Rooms
+          .Where(r => r.BranchId == branchId)
+          .Select(r => new { r.RoomId, r.RoomName, r.Capacity })
+          .ToList();
+
+      return Json(rooms);
+    }
+
+
   }
 }

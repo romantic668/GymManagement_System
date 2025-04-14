@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using GymManagement.Models;
 using GymManagement.ViewModels;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymManagement.Controllers
 {
@@ -10,11 +11,13 @@ namespace GymManagement.Controllers
   {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly IWebHostEnvironment _env;
 
-    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment env)
     {
       _userManager = userManager;
       _signInManager = signInManager;
+      _env = env;
     }
 
     [HttpGet]
@@ -46,8 +49,7 @@ namespace GymManagement.Controllers
           Email = model.Email,
           Name = model.Name,
           JoinDate = DateTime.UtcNow,
-          DOB = model.DOB // ✅ 加上这一行
-
+          DOB = model.DOB
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -86,8 +88,7 @@ namespace GymManagement.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
-      if (!ModelState.IsValid)
-        return View(model);
+      if (!ModelState.IsValid) return View(model);
 
       var result = await _signInManager.PasswordSignInAsync(
           model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -101,13 +102,10 @@ namespace GymManagement.Controllers
 
           if (await _userManager.IsInRoleAsync(user, "Admin"))
             return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
-
           if (await _userManager.IsInRoleAsync(user, "Trainer"))
             return RedirectToAction("Dashboard", "Trainer");
-
           if (await _userManager.IsInRoleAsync(user, "Receptionist"))
             return RedirectToAction("Dashboard", "Receptionist");
-
           if (await _userManager.IsInRoleAsync(user, "Customer"))
             return RedirectToAction("Dashboard", "Customer");
         }
@@ -222,6 +220,138 @@ namespace GymManagement.Controllers
       }
 
       return View(model);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> ViewProfile()
+    {
+      var user = await _userManager.GetUserAsync(User);
+      if (user == null) return NotFound();
+
+      var roles = await _userManager.GetRolesAsync(user);
+
+      var vm = new EditProfileViewModel
+      {
+        UserName = user.UserName ?? "",
+        Name = user.Name,
+        Email = user.Email ?? string.Empty,
+        DOB = user.DOB,
+        ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+    ? "/uploads/profile/default.png"
+    : "/uploads/profile/" + user.ProfileImageName,
+
+        RoleNames = roles
+      };
+
+      return View(vm);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+      var user = await _userManager.GetUserAsync(User);
+      if (user == null) return NotFound();
+
+      var model = new EditProfileViewModel
+      {
+        Name = user.Name,
+        Email = user.Email,
+        DOB = user.DOB,
+        ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+              ? "/uploads/profile/default.png"
+              : "/uploads/profile/" + user.ProfileImageName
+      };
+
+      return View(model);
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    {
+      var user = await _userManager.GetUserAsync(User);
+      if (user == null) return NotFound();
+
+      if (!ModelState.IsValid)
+      {
+        model.ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+            ? "/uploads/profile/default.png"
+            : "/uploads/profile/" + user.ProfileImageName;
+        return View(model);
+      }
+
+      if (!string.Equals(model.Email, user.Email, StringComparison.OrdinalIgnoreCase))
+      {
+        var exists = await _userManager.FindByEmailAsync(model.Email);
+        if (exists != null && exists.Id != user.Id)
+        {
+          ModelState.AddModelError("Email", "This email is already taken.");
+          model.ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+              ? "/uploads/profile/default.png"
+              : "/uploads/profile/" + user.ProfileImageName;
+          return View(model);
+        }
+      }
+
+      user.Name = model.Name;
+      user.Email = model.Email;
+      user.DOB = model.DOB;
+
+      if (model.ProfileImageFile != null && model.ProfileImageFile.Length > 0)
+      {
+        var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp" };
+        var contentType = model.ProfileImageFile.ContentType.ToLower();
+
+        if (!allowedTypes.Contains(contentType))
+        {
+          ModelState.AddModelError("", "Only image files (JPG, PNG, GIF, BMP, WEBP) are allowed.");
+          model.ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+              ? "/uploads/profile/default.png"
+              : "/uploads/profile/" + user.ProfileImageName;
+          return View(model);
+        }
+
+        var folder = Path.Combine(_env.WebRootPath, "uploads", "profile");
+        Directory.CreateDirectory(folder);
+
+        if (!string.IsNullOrEmpty(user.ProfileImageName) && user.ProfileImageName != "default.png")
+        {
+          var oldPath = Path.Combine(folder, user.ProfileImageName);
+          if (System.IO.File.Exists(oldPath))
+            System.IO.File.Delete(oldPath);
+        }
+
+        var uniqueFile = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfileImageFile.FileName);
+        var filePath = Path.Combine(folder, uniqueFile);
+
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await model.ProfileImageFile.CopyToAsync(stream);
+
+        user.ProfileImageName = uniqueFile;
+      }
+
+      if (!string.IsNullOrWhiteSpace(model.Password))
+      {
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+        if (!result.Succeeded)
+        {
+          foreach (var error in result.Errors)
+            ModelState.AddModelError("", error.Description);
+
+          model.ProfileImageUrl = string.IsNullOrEmpty(user.ProfileImageName)
+              ? "/uploads/profile/default.png"
+              : "/uploads/profile/" + user.ProfileImageName;
+          return View(model);
+        }
+      }
+
+      await _userManager.UpdateAsync(user);
+      return RedirectToAction("ViewProfile");
     }
   }
 }

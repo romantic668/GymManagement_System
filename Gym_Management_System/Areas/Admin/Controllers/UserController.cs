@@ -32,23 +32,37 @@ namespace GymManagement.Areas.Admin.Controllers
     }
 
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-      var users = new List<User>();
-      foreach (var user in userManager.Users)
+      const int PageSize = 7;
+
+      var allUsers = userManager.Users;
+      var usersPage = allUsers
+          .OrderBy(u => u.UserName)
+          .Skip((page - 1) * PageSize)
+          .Take(PageSize)
+          .ToList();
+
+      foreach (var user in usersPage)
       {
         user.RoleNames = await userManager.GetRolesAsync(user);
-        users.Add(user);
       }
 
       var model = new UserViewModel
       {
-        Users = users,
-        Roles = roleManager.Roles
+        Users = usersPage,
+        Roles = roleManager.Roles,
+        PagingInfo = new PagingInfo
+        {
+          CurrentPage = page,
+          ItemsPerPage = PageSize,
+          TotalItems = allUsers.Count()
+        }
       };
 
       return View(model);
     }
+
 
 
     [HttpPost]

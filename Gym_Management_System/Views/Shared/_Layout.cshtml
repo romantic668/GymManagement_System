@@ -125,7 +125,7 @@
                                 }
                                 else if (User.IsInRole("Receptionist"))
                                 {
-                                    <li><a asp-controller="Trainer" asp-action="Dashboard">Dashboard</a></li>
+                                    <li><a asp-controller="Receptionist" asp-action="Dashboard">Dashboard</a></li>
                                     <li><a asp-controller="Receptionist" asp-action="ManageBookings">Bookings</a></li>
                                     <li><a asp-controller="Receptionist" asp-action="CheckIn">Check In</a></li>
                                 }
@@ -150,29 +150,33 @@
                     </nav>
                 </div>
 
-                <div class="col-lg-3">
-                    <div class="top-option d-flex justify-content-end align-items-center gap-3">
+                <div class="top-option d-flex justify-content-end align-items-center">
 
-                        @if (isSignedIn)
-                        {
-                            <span class="text-white">Hello, @user?.Name!</span>
-                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="btn btn-warning" style="margin-left:10px">LOGOUT</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <a asp-controller="Account" asp-action="Register" class="text-white">Register</a>
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light">Log In</a>
-                        }
-
-                        <!-- Always visible Admin button -->
-                        <a class="btn btn-warning"
-                            href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin", new { area = "Admin" }) : Url.Action("AccessDenied", "Account"))">
-                            <i class="fa fa-cogs me-1">Admin</i>
+                    @if (isSignedIn)
+                    {
+                        <span class="text-white mr-2">Hello, @user?.Name!</span>
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post"
+                            class="d-inline-block ml-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm">Log Out</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-warning btn-sm mr-2">
+                            <i class="fa fa-user-plus mr-1"></i> Register
                         </a>
-                    </div>
+
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-sm mr-2">
+                            <i class="fa fa-sign-in mr-1"></i> Log In
+                        </a>
+                    }
+
+                    <a class="btn btn-warning btn-sm"
+                        href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin", new { area = "Admin" }) : Url.Action("AccessDenied", "Account"))">
+                        <i class="fa fa-cogs mr-1"></i> Admin
+                    </a>
                 </div>
+
             </div>
         </div>
     </header>

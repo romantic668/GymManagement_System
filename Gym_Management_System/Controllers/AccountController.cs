@@ -146,42 +146,55 @@ namespace GymManagement.Controllers
       }
 
       var info = await _signInManager.GetExternalLoginInfoAsync();
-      if (info == null) return RedirectToAction(nameof(Login));
+      if (info == null)
+      {
+        ModelState.AddModelError("", "External login info is null.");
+        return RedirectToAction(nameof(Login));
+      }
 
       var result = await _signInManager.ExternalLoginSignInAsync(
           info.LoginProvider, info.ProviderKey, isPersistent: false);
 
-      if (result.Succeeded) return Redirect(returnUrl);
-
-      var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-      var fullName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email ?? "Google User";
-
-      if (email != null)
+      if (result.Succeeded)
       {
-        var user = new User
-        {
-          UserName = email,
-          Email = email,
-          Name = fullName,
-          JoinDate = DateTime.UtcNow
-        };
+        return Redirect(returnUrl);
+      }
 
-        var createResult = await _userManager.CreateAsync(user);
-        if (createResult.Succeeded)
-        {
-          await _userManager.AddLoginAsync(user, info);
-          await _userManager.AddToRoleAsync(user, "Customer");
-          user.RoleNames = await _userManager.GetRolesAsync(user);
-          await _signInManager.SignInAsync(user, isPersistent: false);
-          return RedirectToAction("Dashboard", "Customer");
-        }
+      var email = info.Principal?.FindFirstValue(ClaimTypes.Email);
+      var fullName = info.Principal?.FindFirstValue(ClaimTypes.Name) ?? email ?? "Google User";
 
-        foreach (var error in createResult.Errors)
-          ModelState.AddModelError("", error.Description);
+      if (string.IsNullOrWhiteSpace(email))
+      {
+        ModelState.AddModelError("", "Google account missing email claim.");
+        return RedirectToAction(nameof(Login));
+      }
+
+      var user = new User
+      {
+        UserName = email,
+        Email = email,
+        Name = fullName,
+        JoinDate = DateTime.UtcNow
+      };
+
+      var createResult = await _userManager.CreateAsync(user);
+      if (createResult.Succeeded)
+      {
+        await _userManager.AddLoginAsync(user, info);
+        await _userManager.AddToRoleAsync(user, "Customer");
+        user.RoleNames = await _userManager.GetRolesAsync(user);
+        await _signInManager.SignInAsync(user, isPersistent: false);
+        return RedirectToAction("Dashboard", "Customer");
+      }
+
+      foreach (var error in createResult.Errors)
+      {
+        ModelState.AddModelError("", error.Description);
       }
 
       return RedirectToAction(nameof(Login));
     }
+
 
     public IActionResult AccessDenied() => View();
 

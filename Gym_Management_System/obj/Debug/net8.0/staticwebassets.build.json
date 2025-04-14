@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "HWt6C1YyDUHGJhCKzcLSHUFz7ns1t2M46Xsub+4pnEY=",
+  "Hash": "5oRDDauLE3GCpEDMOscRtnpqu+irdomkKp/AnkQ2D0o=",
   "Source": "GymManagement",
   "BasePath": "_content/GymManagement",
   "Mode": "Default",
@@ -1459,8 +1459,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "5taryw3oxu",
-      "Integrity": "h35kgZx6Jn/av1y3E3P0QM/vmTeVlAEPVD3S/sKl0f4=",
+      "Fingerprint": "ygqg1m7o2z",
+      "Integrity": "/uwyFJVG8BK1oTO5r9groPMLM10nZwmLGJJ7jnvya48=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -8617,51 +8617,6 @@
       ]
     },
     {
-      "Route": "css/site.5taryw3oxu.css",
-      "AssetFile": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2974"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"h35kgZx6Jn/av1y3E3P0QM/vmTeVlAEPVD3S/sKl0f4=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 01 Apr 2025 08:24:58 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "5taryw3oxu"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-h35kgZx6Jn/av1y3E3P0QM/vmTeVlAEPVD3S/sKl0f4="
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -8672,7 +8627,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2974"
+          "Value": "3199"
         },
         {
           "Name": "Content-Type",
@@ -8680,11 +8635,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"h35kgZx6Jn/av1y3E3P0QM/vmTeVlAEPVD3S/sKl0f4=\""
+          "Value": "\"/uwyFJVG8BK1oTO5r9groPMLM10nZwmLGJJ7jnvya48=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 01 Apr 2025 08:24:58 GMT"
+          "Value": "Mon, 14 Apr 2025 07:40:10 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -8694,7 +8649,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-h35kgZx6Jn/av1y3E3P0QM/vmTeVlAEPVD3S/sKl0f4="
+          "Value": "sha256-/uwyFJVG8BK1oTO5r9groPMLM10nZwmLGJJ7jnvya48="
         }
       ]
     },
@@ -8777,6 +8732,51 @@
         {
           "Name": "integrity",
           "Value": "sha256-tNUPdUhYzEJbaInmjiuwPt6NsrFX5aI3SfORBm3Er6s="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.ygqg1m7o2z.css",
+      "AssetFile": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3199"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/uwyFJVG8BK1oTO5r9groPMLM10nZwmLGJJ7jnvya48=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 14 Apr 2025 07:40:10 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ygqg1m7o2z"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-/uwyFJVG8BK1oTO5r9groPMLM10nZwmLGJJ7jnvya48="
         }
       ]
     },
@@ -9951,7 +9951,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:05:15 GMT"
+          "Value": "Mon, 14 Apr 2025 06:05:46 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -9988,7 +9988,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:05:15 GMT"
+          "Value": "Mon, 14 Apr 2025 06:05:46 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -10025,7 +10025,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:05:15 GMT"
+          "Value": "Mon, 14 Apr 2025 06:05:46 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -10070,7 +10070,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:05:15 GMT"
+          "Value": "Mon, 14 Apr 2025 06:05:46 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13565,7 +13565,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:24:39 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13610,7 +13610,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:24:39 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13647,7 +13647,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:24:57 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13692,7 +13692,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:24:57 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13729,7 +13729,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:14 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13774,7 +13774,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:14 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13811,7 +13811,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:31 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13856,7 +13856,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:31 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13893,7 +13893,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:58 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13930,7 +13930,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:25:58 GMT"
+          "Value": "Mon, 14 Apr 2025 06:03:16 GMT"
         },
         {
           "Name": "Cache-Control",

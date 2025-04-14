@@ -1,8 +1,14 @@
-public class TrainerDashboardViewModel
+using GymManagement.Models;
+
+
+namespace GymManagement.ViewModels
 {
-  public required string Name { get; set; }
-  public required string Specialization { get; set; }
-  public required int TotalSessions { get; set; }
-  public required int TotalStudents { get; set; }
-  public required List<SessionViewModel> UpcomingSessions { get; set; }
+  public class TrainerDashboardViewModel
+  {
+    public int TotalSessions { get; set; }
+    public int TodaySessionsCount { get; set; }
+    public int TotalGymClasses { get; set; }
+
+    public List<Session> UpcomingSessions { get; set; } = new();
+  }
 }

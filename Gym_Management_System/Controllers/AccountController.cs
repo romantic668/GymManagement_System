@@ -20,6 +20,21 @@ namespace GymManagement.Controllers
       _env = env;
     }
 
+    private async Task<IActionResult> RedirectToDashboardByRole(User user)
+    {
+      if (await _userManager.IsInRoleAsync(user, "Admin"))
+        return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
+      if (await _userManager.IsInRoleAsync(user, "Trainer"))
+        return RedirectToAction("Dashboard", "Trainer");
+      if (await _userManager.IsInRoleAsync(user, "Receptionist"))
+        return RedirectToAction("Dashboard", "Receptionist");
+      if (await _userManager.IsInRoleAsync(user, "Customer"))
+        return RedirectToAction("Dashboard", "Customer");
+
+      return RedirectToAction("Index", "Home");
+    }
+
+
     [HttpGet]
     public IActionResult Register() => View();
 
@@ -95,27 +110,18 @@ namespace GymManagement.Controllers
 
       if (result.Succeeded)
       {
-        var user = await _userManager.FindByNameAsync(model.Username);
-        if (user != null)
+        var signedInUser = await _userManager.FindByNameAsync(model.Username);
+        if (signedInUser != null)
         {
-          user.RoleNames = await _userManager.GetRolesAsync(user);
-
-          if (await _userManager.IsInRoleAsync(user, "Admin"))
-            return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
-          if (await _userManager.IsInRoleAsync(user, "Trainer"))
-            return RedirectToAction("Dashboard", "Trainer");
-          if (await _userManager.IsInRoleAsync(user, "Receptionist"))
-            return RedirectToAction("Dashboard", "Receptionist");
-          if (await _userManager.IsInRoleAsync(user, "Customer"))
-            return RedirectToAction("Dashboard", "Customer");
+          signedInUser.RoleNames = await _userManager.GetRolesAsync(signedInUser);
+          return await RedirectToDashboardByRole(signedInUser);
         }
-
-        return RedirectToAction("Index", "Home");
       }
 
       ModelState.AddModelError(string.Empty, "Invalid username or password.");
       return View(model);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -157,6 +163,12 @@ namespace GymManagement.Controllers
 
       if (result.Succeeded)
       {
+        var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+        if (existingUser != null)
+        {
+          return await RedirectToDashboardByRole(existingUser);
+        }
+
         return Redirect(returnUrl);
       }
 
@@ -169,7 +181,7 @@ namespace GymManagement.Controllers
         return RedirectToAction(nameof(Login));
       }
 
-      var user = new User
+      var newUser = new User
       {
         UserName = email,
         Email = email,
@@ -177,14 +189,14 @@ namespace GymManagement.Controllers
         JoinDate = DateTime.UtcNow
       };
 
-      var createResult = await _userManager.CreateAsync(user);
+      var createResult = await _userManager.CreateAsync(newUser);
       if (createResult.Succeeded)
       {
-        await _userManager.AddLoginAsync(user, info);
-        await _userManager.AddToRoleAsync(user, "Customer");
-        user.RoleNames = await _userManager.GetRolesAsync(user);
-        await _signInManager.SignInAsync(user, isPersistent: false);
-        return RedirectToAction("Dashboard", "Customer");
+        await _userManager.AddLoginAsync(newUser, info);
+        await _userManager.AddToRoleAsync(newUser, "Customer");
+        newUser.RoleNames = await _userManager.GetRolesAsync(newUser);
+        await _signInManager.SignInAsync(newUser, isPersistent: false);
+        return await RedirectToDashboardByRole(newUser);
       }
 
       foreach (var error in createResult.Errors)

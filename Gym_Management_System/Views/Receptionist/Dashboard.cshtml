@@ -5,57 +5,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    .breadcrumb-section {
-        background-image: url('/img/breadcrumb-bg.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        padding: 100px 0;
-        color: white;
-    }
-
-    .breadcrumb-text h2,
-    .breadcrumb-text a,
-    .breadcrumb-text span {
-        color: white;
-    }
-
-    th,
-    td {
-        color: #fff;
-        vertical-align: middle;
-    }
-
-    .table {
-        background-color: #1c1c1c;
-    }
-
-    .table thead th {
-        background-color: #292b2c;
-        color: #ffc107;
-        font-weight: bold;
-        border-color: #444;
-    }
-
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #2a2a2a;
-    }
-
-    .table-striped tbody tr:nth-of-type(even) {
-        background-color: #1f1f1f;
-    }
-
-    .section-title h2,
-    .section-title h3 {
-        color: #ffc107;
-    }
-
-    .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
-    }
-</style>
 
 <section class="breadcrumb-section">
     <div class="container">
@@ -147,7 +96,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var b in Model.PendingBookings)
+                @foreach (var b in Model.CheckInBookings)
                 {
                     <tr>
                         <td>@b.Customer.Name</td>

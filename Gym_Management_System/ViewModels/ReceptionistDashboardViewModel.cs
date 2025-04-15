@@ -10,6 +10,6 @@ namespace GymManagement.ViewModels
 
         public List<Session> TodaySessions { get; set; } = new();
 
-        public List<Booking> PendingBookings { get; set; } = new();
+        public List<Booking> CheckInBookings { get; set; } = new();
     }
 }

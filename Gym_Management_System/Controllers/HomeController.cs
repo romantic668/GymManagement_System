@@ -1,23 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using GymManagement.Models;
 
 namespace GymManagement.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly UserManager<User> _userManager;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(UserManager<User> userManager, ILogger<HomeController> logger)
         {
+            _userManager = userManager;
             _logger = logger;
         }
 
+
         // 首页
-        [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            _logger.LogInformation("Visited Home page");
-            return View();
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var roles = await _userManager.GetRolesAsync(user);
+
+                if (roles.Contains("Admin"))
+                    return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
+
+                if (roles.Contains("Trainer"))
+                    return RedirectToAction("Dashboard", "Trainer");
+
+                if (roles.Contains("Receptionist"))
+                    return RedirectToAction("Dashboard", "Receptionist");
+
+                if (roles.Contains("Customer"))
+                    return RedirectToAction("Dashboard", "Customer");
+            }
+
+            return View(); // fallback for not logged-in
         }
 
         // 课程时间表页

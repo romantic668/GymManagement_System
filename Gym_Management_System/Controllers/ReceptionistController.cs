@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using GymManagement.Data;
 using GymManagement.Models;
 using GymManagement.ViewModels;
+using Microsoft.AspNetCore.Identity;
+
 
 using System.Security.Claims;
 
@@ -14,11 +16,14 @@ namespace GymManagement.Controllers
   public class ReceptionistController : Controller
   {
     private readonly AppDbContext _db;
+private readonly UserManager<User> _userManager;
 
-    public ReceptionistController(AppDbContext db)
-    {
-      _db = db;
-    }
+public ReceptionistController(AppDbContext db, UserManager<User> userManager)
+{
+    _db = db;
+    _userManager = userManager;
+}
+
 
     // 获取当前 Receptionist 实体
     private Receptionist? GetCurrentReceptionist()
@@ -55,9 +60,11 @@ namespace GymManagement.Controllers
         TodaySessions = todaySessions,
         TodayTotalBookings = todayBookings.Count,
         TodayCheckedIn = todayBookings.Count(b => b.Status == BookingStatus.CheckedIn),
-        PendingBookings = todayBookings
-              .OrderBy(b => b.Session.SessionDateTime)
-              .ToList()
+        CheckInBookings = todayBookings
+    .Where(b => b.Status == BookingStatus.Confirmed || b.Status == BookingStatus.CheckedIn)
+    .OrderBy(b => b.Session.SessionDateTime)
+    .ToList()
+
       };
 
       return View(model);
@@ -154,43 +161,79 @@ namespace GymManagement.Controllers
       return View(schedule);
     }
 
-    [HttpGet]
-    public IActionResult ManageBookings()
+    [Authorize(Roles = "Receptionist")]
+public async Task<IActionResult> ManageBookings(string filter, string value, int page = 1)
+{
+    const int pageSize = 10;
+
+    var receptionist = GetCurrentReceptionist();
+    if (receptionist == null) return NotFound("Receptionist not found.");
+
+    var branchId = receptionist.BranchId;
+
+    // ✅ 限定只查当前 Receptionist 分店的 bookings
+    var bookings = _db.Bookings
+        .Include(b => b.Customer)
+        .Include(b => b.Session).ThenInclude(s => s.GymClass)
+        .Include(b => b.Session).ThenInclude(s => s.Trainer)
+        .Include(b => b.Session).ThenInclude(s => s.Room)
+        .Where(b => b.Session.Room.BranchId == branchId)
+        .OrderByDescending(b => b.Session.SessionDateTime)
+        .ToList();
+
+    // ✅ 筛选过滤
+    switch (filter)
     {
-      var receptionist = GetCurrentReceptionist();
-      if (receptionist == null) return NotFound();
-
-      var bookings = _db.Bookings
-          .Include(b => b.Customer)
-          .Include(b => b.Session)
-              .ThenInclude(s => s.GymClass)
-          .Include(b => b.Session.Trainer)
-          .Where(b => b.Session.Room.BranchId == receptionist.BranchId)
-          .OrderByDescending(b => b.Session.SessionDateTime)
-          .ToList();
-
-      var sessions = _db.Sessions
-          .Where(s => s.Room.BranchId == receptionist.BranchId)
-          .OrderBy(s => s.SessionDateTime)
-          .ToList();
-
-      var customers = _db.Customers
-          .Where(c => c.GymBranchId == receptionist.BranchId)
-          .ToList();
-
-      var vm = new ManageBookingsViewModel
-      {
-        AllBookings = bookings,
-        CustomerList = customers.Select(c => new SelectListItem { Text = c.Name, Value = c.Id }).ToList(),
-        SessionList = sessions.Select(s => new SelectListItem
-        {
-          Text = $"{s.GymClass.ClassName} - {s.SessionDateTime:MMM dd HH:mm}",
-          Value = s.SessionId.ToString()
-        }).ToList()
-      };
-
-      return View(vm);
+        case "class":
+            bookings = bookings.Where(b => b.Session.GymClass.ClassName == value).ToList();
+            break;
+        case "trainer":
+            bookings = bookings.Where(b => b.Session.Trainer.Name == value).ToList();
+            break;
+        case "date":
+            if (DateTime.TryParse(value, out var parsedDate))
+                bookings = bookings.Where(b => b.Session.SessionDateTime.Date == parsedDate).ToList();
+            break;
+        case "status":
+            if (Enum.TryParse<BookingStatus>(value, out var status))
+                bookings = bookings.Where(b => b.Status == status).ToList();
+            break;
     }
+
+    // ✅ 限定当前分店的 Customer
+    var customers = _db.Customers
+        .Where(c => c.GymBranchId == branchId)
+        .Select(c => new SelectListItem
+        {
+            Value = c.Id,
+            Text = c.Name
+        }).ToList();
+
+    // ✅ 限定当前分店的 Session
+    var sessions = _db.Sessions
+        .Include(s => s.GymClass)
+        .Include(s => s.Room)
+        .Where(s => s.Room.BranchId == branchId)
+        .OrderBy(s => s.SessionDateTime)
+        .Select(s => new SelectListItem
+        {
+            Value = s.SessionId.ToString(),
+            Text = $"{s.GymClass.ClassName} - {s.SessionDateTime:MM/dd HH:mm}"
+        }).ToList();
+
+    var vm = new ManageBookingsViewModel
+    {
+        AllBookings = bookings,
+        CustomerList = customers,
+        SessionList = sessions,
+        NewBooking = new CreateBookingInputModel()
+    };
+
+    return View(vm);
+}
+
+
+
 
     [HttpPost]
     public IActionResult CreateBooking(CreateBookingInputModel input)
@@ -209,28 +252,41 @@ namespace GymManagement.Controllers
       return RedirectToAction("ManageBookings");
     }
 
-    public IActionResult ConfirmBooking(int bookingId)
-    {
-      var booking = _db.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
-      if (booking == null) return NotFound();
-
-      booking.Status = BookingStatus.Confirmed;
-      _db.SaveChanges();
-
-      return Ok();
-    }
-
     [HttpPost]
-    public IActionResult CancelBooking(int bookingId)
+public IActionResult ConfirmBooking(int bookingId, string @class, string trainer, string date, string status, int page)
+{
+    var booking = _db.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
+    if (booking != null && booking.Status == BookingStatus.Pending)
     {
-      var booking = _db.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
-      if (booking == null) return NotFound();
-
-      booking.Status = BookingStatus.Canceled;
-      _db.SaveChanges();
-
-      return Ok();
+        booking.Status = BookingStatus.Confirmed;
+        _db.SaveChanges();
+        TempData["Message"] = $"Booking #{bookingId} has been confirmed.";
     }
+    else
+    {
+        TempData["Message"] = $"Booking #{bookingId} not found or already processed.";
+    }
+
+    return RedirectToAction("ManageBookings", new { @class, trainer, date, status, page });
+}
+
+[HttpPost]
+public IActionResult CancelBooking(int bookingId, string @class, string trainer, string date, string status, int page)
+{
+    var booking = _db.Bookings.FirstOrDefault(b => b.BookingId == bookingId);
+    if (booking != null && booking.Status == BookingStatus.Pending)
+    {
+        booking.Status = BookingStatus.Canceled;
+        _db.SaveChanges();
+        TempData["Message"] = $"Booking #{bookingId} has been canceled.";
+    }
+    else
+    {
+        TempData["Message"] = $"Booking #{bookingId} not found or already processed.";
+    }
+
+    return RedirectToAction("ManageBookings", new { @class, trainer, date, status, page });
+}
 
     [HttpGet]
     public IActionResult TimetableBooking()

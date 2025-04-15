@@ -141,6 +141,9 @@ namespace GymManagement.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ImageName")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("TrainerId")
                         .IsRequired()
                         .HasColumnType("TEXT");

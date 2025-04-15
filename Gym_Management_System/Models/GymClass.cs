@@ -28,6 +28,9 @@ namespace GymManagement.Models
     [ForeignKey("TrainerId")]
     public Trainer Trainer { get; set; } = null!;
 
+    public string? ImageName { get; set; } = "class-default.jpg";
+
+
     [Required]
     public ICollection<Session> Sessions { get; set; } = new List<Session>();
   }

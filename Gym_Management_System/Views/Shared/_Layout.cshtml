@@ -39,6 +39,65 @@
 
 
 
+<!-- Orbitron 字体 -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<!-- 自定义霓虹样式 -->
+<style>
+    .breadcrumb-section {
+        background-image: url('/img/breadcrumb-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 100px 0;
+        color: white;
+    }
+
+    .breadcrumb-text h2,
+    .breadcrumb-text a,
+    .breadcrumb-text span {
+        color: white;
+    }
+
+    th,
+    td {
+        color: #fff;
+        vertical-align: middle;
+    }
+
+    .table {
+        background-color: #1c1c1c;
+    }
+
+    .table thead th {
+        background-color: #292b2c;
+        color: #ffc107;
+        font-weight: bold;
+        border-color: #444;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #2a2a2a;
+    }
+
+    .table-striped tbody tr:nth-of-type(even) {
+        background-color: #1f1f1f;
+    }
+
+    .section-title h2,
+    .section-title h3 {
+        color: #ffc107;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+</style>
+
+@RenderSection("Styles", required: false)
+
+
 </head>
 
 <body>
@@ -104,49 +163,107 @@
                             @if (showGuestMenu)
                             {
                                 <li class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")">
-                                    <a asp-controller="Home" asp-action="Index">Home</a>
+                                    <a asp-controller="Home" asp-action="Index">
+                                        <i class="fa fa-home me-1"></i> Home
+                                    </a>
                                 </li>
-
                                 <li class="@(currentController == "GymBranch" ? "active" : "")">
-                                    <a asp-controller="GymBranch" asp-action="Index">Gym Branches</a>
+                                    <a asp-controller="GymBranch" asp-action="Index">
+                                        <i class="fa fa-building me-1"></i> Gym Branches
+                                    </a>
                                 </li>
-
-
-
-
                             }
 
                             @if (!showGuestMenu)
                             {
                                 if (User.IsInRole("Trainer"))
                                 {
-                                    <li><a asp-controller="Trainer" asp-action="Dashboard">Dashboard</a></li>
-                                    <li><a asp-controller="Trainer" asp-action="ViewSessions">Sessions</a></li>
+                                    <li class="@(currentController == "Trainer" && currentAction == "Dashboard" ? "active" : "")">
+                                        <a asp-controller="Trainer" asp-action="Dashboard">
+                                            <i class="fa fa-tachometer-alt me-1"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Trainer" && currentAction == "MyGymClasses" ? "active" : "")">
+                                        <a asp-controller="Trainer" asp-action="MyGymClasses">
+                                            <i class="fa fa-dumbbell me-1"></i> My Gym Classes
+                                        </a>
+                                    </li>
                                 }
                                 else if (User.IsInRole("Receptionist"))
                                 {
-                                    <li><a asp-controller="Receptionist" asp-action="Dashboard">Dashboard</a></li>
-                                    <li><a asp-controller="Receptionist" asp-action="ManageBookings">Bookings</a></li>
-                                    <li><a asp-controller="Receptionist" asp-action="CheckIn">Check In</a></li>
+                                    <li class="@(currentController == "Receptionist" && currentAction == "Dashboard" ? "active" : "")">
+                                        <a asp-controller="Receptionist" asp-action="Dashboard">
+                                            <i class="fa fa-tachometer-alt me-1"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Receptionist" && currentAction == "ManageBookings" ? "active" : "")">
+                                        <a asp-controller="Receptionist" asp-action="ManageBookings">
+                                            <i class="fa fa-calendar-alt me-1"></i> Bookings
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Receptionist" && currentAction == "CheckIn" ? "active" : "")">
+                                        <a asp-controller="Receptionist" asp-action="CheckIn">
+                                            <i class="fa fa-user-check me-1"></i> Check In
+                                        </a>
+                                    </li>
                                 }
                                 else if (User.IsInRole("Customer"))
                                 {
-
-                                    <li><a asp-controller="Customer" asp-action="Dashboard">Customer Dashboard</a></li>
-                                    <li><a asp-controller="Customer" asp-action="Profile">Profile</a></li>
-                                    <li><a asp-controller="Customer" asp-action="Bookings">Bookings</a></li>
-                                    <li><a asp-controller="Customer" asp-action="BookSession">Book Session</a></li>
-                                    <li><a asp-controller="Customer" asp-action="Membership">Membership</a></li>
-                                    <li><a asp-controller="Customer" asp-action="MyBookings">My Bookings</a></li>
-                                    <li><a asp-controller="Customer" asp-action="Payments">Payments</a></li>
-                                    <li><a asp-controller="Customer" asp-action="SessionCalendar">Session Calendar</a></li>
-                                    <li><a asp-controller="Customer" asp-action="TrainerList">Trainer List</a></li>
+                                    <li class="@(currentController == "Customer" && currentAction == "Dashboard" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="Dashboard">
+                                            <i class="fa fa-home me-1"></i> Customer Dashboard
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "Profile" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="Profile">
+                                            <i class="fa fa-user me-1"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "Bookings" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="Bookings">
+                                            <i class="fa fa-calendar-check me-1"></i> Bookings
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "BookSession" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="BookSession">
+                                            <i class="fa fa-plus-circle me-1"></i> Book Session
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "Membership" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="Membership">
+                                            <i class="fa fa-id-card me-1"></i> Membership
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "MyBookings" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="MyBookings">
+                                            <i class="fa fa-list-alt me-1"></i> My Bookings
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "Payments" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="Payments">
+                                            <i class="fa fa-credit-card me-1"></i> Payments
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "SessionCalendar" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="SessionCalendar">
+                                            <i class="fa fa-calendar me-1"></i> Session Calendar
+                                        </a>
+                                    </li>
+                                    <li class="@(currentController == "Customer" && currentAction == "TrainerList" ? "active" : "")">
+                                        <a asp-controller="Customer" asp-action="TrainerList">
+                                            <i class="fa fa-users me-1"></i> Trainer List
+                                        </a>
+                                    </li>
                                 }
                             }
+
                             <li class="@(currentController == "Home" && currentAction == "Contact" ? "active" : "")">
-                                <a asp-controller="Home" asp-action="Contact">Contact</a>
+                                <a asp-controller="Home" asp-action="Contact">
+                                    <i class="fa fa-envelope me-1"></i> Contact
+                                </a>
                             </li>
                         </ul>
+
                     </nav>
                 </div>
 

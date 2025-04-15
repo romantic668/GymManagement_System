@@ -1289,12 +1289,32 @@
       "PackagePath": "staticwebassets\\scss\\site.scss"
     },
     {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\gymclass\\2bfc124c-22a6-44cd-aa90-ee4a02ecd749.png",
+      "PackagePath": "staticwebassets\\uploads\\gymclass\\2bfc124c-22a6-44cd-aa90-ee4a02ecd749.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\gymclass\\882811dc-9e7f-4171-be7e-aec49df234b3.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\gymclass\\882811dc-9e7f-4171-be7e-aec49df234b3.jpeg"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\gymclass\\class-default.jpg",
+      "PackagePath": "staticwebassets\\uploads\\gymclass\\class-default.jpg"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\gymclass\\e534ceb7-29e5-4306-a568-98771424fb0e.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\gymclass\\e534ceb7-29e5-4306-a568-98771424fb0e.jpeg"
+    },
+    {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\5655084d-8a31-4c6a-808a-0af9a5845fcd.jpg",
       "PackagePath": "staticwebassets\\uploads\\profile\\5655084d-8a31-4c6a-808a-0af9a5845fcd.jpg"
     },
     {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\5aa77f1f-4f94-4632-8340-5b984ba395a0.png",
       "PackagePath": "staticwebassets\\uploads\\profile\\5aa77f1f-4f94-4632-8340-5b984ba395a0.png"
+    },
+    {
+      "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\db4ee512-eda7-48a2-8a6f-69788ca9567c.jpg",
+      "PackagePath": "staticwebassets\\uploads\\profile\\db4ee512-eda7-48a2-8a6f-69788ca9567c.jpg"
     },
     {
       "Id": "C:\\Users\\cong_\\Gym_Management_System\\Gym_Management_System\\wwwroot\\uploads\\profile\\default.png",

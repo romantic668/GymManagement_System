@@ -17,7 +17,12 @@
 
   <div class="form-group mb-3">
     <label asp-for="Password" class="text-white"></label>
-    <input asp-for="Password" class="form-control" />
+    <div class="input-group">
+      <input asp-for="Password" class="form-control" id="passwordInput" />
+      <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1">
+        <i class="fa fa-eye" id="toggleIcon"></i>
+      </button>
+    </div>
     <span asp-validation-for="Password" class="text-danger"></span>
   </div>
 
@@ -60,4 +65,17 @@
 
 @section Scripts {
   <partial name="_ValidationScriptsPartial" />
+  <script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    togglePassword.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      toggleIcon.classList.toggle('fa-eye');
+      toggleIcon.classList.toggle('fa-eye-slash');
+    });
+  </script>
 }

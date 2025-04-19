@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using GymManagement.Models;
 using GymManagement.ViewModels;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using GymManagement.Data;
 
 namespace GymManagement.Controllers
 {
@@ -12,12 +14,14 @@ namespace GymManagement.Controllers
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IWebHostEnvironment _env;
+    private readonly AppDbContext _dbContext;
 
-    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment env)
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment env,AppDbContext dbContext)
     {
       _userManager = userManager;
       _signInManager = signInManager;
       _env = env;
+      _dbContext = dbContext;
     }
 
     private async Task<IActionResult> RedirectToDashboardByRole(User user)
@@ -38,58 +42,135 @@ namespace GymManagement.Controllers
     [HttpGet]
     public IActionResult Register() => View();
 
-    [HttpPost]
+    // [HttpPost]
+    // [ValidateAntiForgeryToken]
+    // public async Task<IActionResult> Register(RegisterViewModel model)
+    // {
+    //   if (ModelState.IsValid)
+    //   {
+    //     var existingUserByUsername = await _userManager.FindByNameAsync(model.Username);
+    //     if (existingUserByUsername != null)
+    //     {
+    //       ModelState.AddModelError("Username", "This username is already taken.");
+    //       return View(model);
+    //     }
+
+    //     var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+    //     if (existingUserByEmail != null)
+    //     {
+    //       ModelState.AddModelError("Email", "This email is already registered.");
+    //       return View(model);
+    //     }
+
+    //     var user = new User
+    //     {
+    //       UserName = model.Username,
+    //       Email = model.Email,
+    //       Name = model.Name,
+    //       JoinDate = DateTime.UtcNow,
+    //       DOB = model.DOB
+    //     };
+
+    //     var result = await _userManager.CreateAsync(user, model.Password);
+    //     if (result.Succeeded)
+    //     {
+    //       await _userManager.AddToRoleAsync(user, "Customer");
+    //       user.RoleNames = await _userManager.GetRolesAsync(user);
+    //       await _signInManager.SignInAsync(user, isPersistent: false);
+    //       return RedirectToAction("Dashboard", "Customer");
+    //     }
+
+    //     foreach (var error in result.Errors)
+    //     {
+    //       if (error.Code.Contains("Password"))
+    //         ModelState.AddModelError("Password", error.Description);
+    //       else if (error.Code.Contains("Email"))
+    //         ModelState.AddModelError("Email", error.Description);
+    //       else if (error.Code.Contains("UserName"))
+    //         ModelState.AddModelError("Username", error.Description);
+    //       else
+    //         ModelState.AddModelError(string.Empty, error.Description);
+    //     }
+    //   }
+
+    //   return View(model);
+    // }
+     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-      if (ModelState.IsValid)
-      {
-        var existingUserByUsername = await _userManager.FindByNameAsync(model.Username);
-        if (existingUserByUsername != null)
+        if (ModelState.IsValid)
         {
-          ModelState.AddModelError("Username", "This username is already taken.");
-          return View(model);
+            // 1. 获取默认 gym branch（必须存在）
+            var defaultBranch = await _dbContext.GymBranches.FirstOrDefaultAsync();
+            if (defaultBranch == null)
+            {
+                ModelState.AddModelError("", "No gym branches exist in the system. Please contact admin.");
+                return View(model);
+            }
+
+            // 2. 使用 normalized 值防止 UNIQUE 约束报错
+            var normalizedUsername = _userManager.NormalizeName(model.Username);
+            var usernameExists = await _dbContext.Users.AnyAsync(u => u.NormalizedUserName == normalizedUsername);
+            if (usernameExists)
+            {
+                ModelState.AddModelError("Username", "This username is already taken.");
+                return View(model);
+            }
+
+            var normalizedEmail = _userManager.NormalizeEmail(model.Email);
+            var emailExists = await _dbContext.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail);
+            if (emailExists)
+            {
+                ModelState.AddModelError("Email", "This email is already registered.");
+                return View(model);
+            }
+
+            // 3. 构造 Customer 对象
+            var user = new Customer
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                Name = model.Name,
+                JoinDate = DateTime.UtcNow,
+                DOB = model.DOB,
+                PhoneNumber = "",
+                MembershipType = MembershipType.Monthly,
+                MembershipStatus = MembershipStatus.Active,
+                SubscriptionDate = DateTime.Now,
+                MembershipExpiry = DateTime.Now.AddMonths(1),
+                GymBranchId = defaultBranch.BranchId
+            };
+
+            // 4. 使用 Identity 创建用户（此操作会写入 AspNetUsers 表）
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                // 5. 加角色
+                await _userManager.AddToRoleAsync(user, "Customer");
+
+                // 6. 登录
+                user.RoleNames = await _userManager.GetRolesAsync(user);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                return RedirectToAction("Dashboard", "Customer");
+            }
+
+            // 7. 出错处理
+            foreach (var error in result.Errors)
+            {
+                if (error.Code.Contains("Password"))
+                    ModelState.AddModelError("Password", error.Description);
+                else if (error.Code.Contains("Email"))
+                    ModelState.AddModelError("Email", error.Description);
+                else if (error.Code.Contains("UserName"))
+                    ModelState.AddModelError("Username", error.Description);
+                else
+                    ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
 
-        var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
-        if (existingUserByEmail != null)
-        {
-          ModelState.AddModelError("Email", "This email is already registered.");
-          return View(model);
-        }
-
-        var user = new User
-        {
-          UserName = model.Username,
-          Email = model.Email,
-          Name = model.Name,
-          JoinDate = DateTime.UtcNow,
-          DOB = model.DOB
-        };
-
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (result.Succeeded)
-        {
-          await _userManager.AddToRoleAsync(user, "Customer");
-          user.RoleNames = await _userManager.GetRolesAsync(user);
-          await _signInManager.SignInAsync(user, isPersistent: false);
-          return RedirectToAction("Dashboard", "Customer");
-        }
-
-        foreach (var error in result.Errors)
-        {
-          if (error.Code.Contains("Password"))
-            ModelState.AddModelError("Password", error.Description);
-          else if (error.Code.Contains("Email"))
-            ModelState.AddModelError("Email", error.Description);
-          else if (error.Code.Contains("UserName"))
-            ModelState.AddModelError("Username", error.Description);
-          else
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-      }
-
-      return View(model);
+        return View(model);
     }
 
     [HttpGet]

@@ -29,10 +29,14 @@
 
   <div class="form-group mb-3">
     <label asp-for="Password" class="text-white"></label>
-    <input asp-for="Password" class="form-control" id="Password" />
+    <div class="input-group">
+      <input asp-for="Password" class="form-control" id="Password" />
+      <button type="button" class="btn btn-outline-secondary" id="togglePassword" tabindex="-1">
+        <i class="fa fa-eye" id="toggleIcon"></i>
+      </button>
+    </div>
     <span asp-validation-for="Password" class="text-danger"></span>
 
-    <!-- ✅ Password Rules Feedback -->
     <div class="text-white mt-2" id="passwordRules">
       <small id="rule-length">❌ At least 6 characters</small><br />
       <small id="rule-digit">❌ At least one number</small><br />
@@ -44,7 +48,12 @@
 
   <div class="form-group mb-3">
     <label asp-for="ConfirmPassword" class="text-white"></label>
-    <input asp-for="ConfirmPassword" class="form-control" />
+    <div class="input-group">
+      <input asp-for="ConfirmPassword" class="form-control" id="ConfirmPassword" />
+      <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword" tabindex="-1">
+        <i class="fa fa-eye" id="toggleConfirmIcon"></i>
+      </button>
+    </div>
     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
   </div>
 
@@ -68,7 +77,6 @@
 
   <script>
     $(function () {
-      // ✅ 密码强度提示初始化
       const passwordInput = document.getElementById("Password");
       const passwordRules = document.getElementById("passwordRules");
 
@@ -99,7 +107,7 @@
         });
       }
 
-      // ✅ MinAge 客户端验证器注册
+      //  MinAge 客户端验证器注册
       $.validator.addMethod("minage", function (value, element, params) {
         if (!value) return true; // 留给 [Required] 去处理
         const birthDate = new Date(value);
@@ -120,5 +128,23 @@
       $("#registerForm").removeData("unobtrusiveValidation");
       $.validator.unobtrusive.parse("#registerForm");
     });
+
+    function setupPasswordToggle(inputId, buttonId, iconId) {
+    const input = document.getElementById(inputId);
+    const button = document.getElementById(buttonId);
+    const icon = document.getElementById(iconId);
+
+    if (!input || !button || !icon) return;
+
+    button.addEventListener('click', function () {
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+      });
+    }
+    setupPasswordToggle('Password', 'togglePassword', 'toggleIcon');
+    setupPasswordToggle('ConfirmPassword', 'toggleConfirmPassword', 'toggleConfirmIcon');
+
   </script>
 }

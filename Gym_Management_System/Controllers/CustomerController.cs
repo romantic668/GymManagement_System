@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 
 namespace GymManagement.Controllers
 {
@@ -144,73 +145,73 @@ namespace GymManagement.Controllers
 
         // 3. Membership Status
         [HttpGet]
-public async Task<IActionResult> Membership()
-{
-    var customer = await GetCurrentCustomerAsync();
-
-    var vm = new MembershipViewModel
-    {
-        Name = customer.Name,
-        MembershipType = customer.MembershipType.ToString(),
-        MembershipStatus = customer.MembershipStatus.ToString(),
-        ExpiryDate = customer.MembershipExpiry,
-        RemainingDays = customer.MembershipExpiry.HasValue
-            ? (customer.MembershipExpiry.Value.Date - DateTime.UtcNow.Date).Days
-            : 0,
-        Payments = customer.Payments.Select(p => new PaymentViewModel
+        public async Task<IActionResult> Membership()
         {
-            Price = p.Price,
-            PaymentMethod = p.PaymentMethod,
-            PaymentDate = p.PaymentDate
-        }).ToList()
-    };
+            var customer = await GetCurrentCustomerAsync();
 
-    return View(vm);
-}
+            var vm = new MembershipViewModel
+            {
+                Name = customer.Name,
+                MembershipType = customer.MembershipType.ToString(),
+                MembershipStatus = customer.MembershipStatus.ToString(),
+                ExpiryDate = customer.MembershipExpiry,
+                RemainingDays = customer.MembershipExpiry.HasValue
+                    ? (customer.MembershipExpiry.Value.Date - DateTime.UtcNow.Date).Days
+                    : 0,
+                Payments = customer.Payments.Select(p => new PaymentViewModel
+                {
+                    Price = p.Price,
+                    PaymentMethod = p.PaymentMethod,
+                    PaymentDate = p.PaymentDate
+                }).ToList()
+            };
 
-[HttpPost]
-public async Task<IActionResult> RenewMembership(string plan)
-{
-    var customer = await GetCurrentCustomerAsync();
+            return View(vm);
+        }
 
-    customer.MembershipStatus = MembershipStatus.Active;
-    customer.SubscriptionDate = DateTime.UtcNow;
+        [HttpPost]
+        public async Task<IActionResult> RenewMembership(string plan)
+        {
+            var customer = await GetCurrentCustomerAsync();
 
-    // 设置类型和时间
-    MembershipType selectedType = MembershipType.Monthly;
-    switch (plan)
-    {
-        case "Quarterly":
-            selectedType = MembershipType.Quarterly;
-            customer.MembershipExpiry = DateTime.UtcNow.AddMonths(3);
-            break;
-        case "Yearly":
-            selectedType = MembershipType.Yearly;
-            customer.MembershipExpiry = DateTime.UtcNow.AddYears(1);
-            break;
-        default:
-            customer.MembershipExpiry = DateTime.UtcNow.AddMonths(1);
-            break;
-    }
+            customer.MembershipStatus = MembershipStatus.Active;
+            customer.SubscriptionDate = DateTime.UtcNow;
 
-    customer.MembershipType = selectedType;
+            // 设置类型和时间
+            MembershipType selectedType = MembershipType.Monthly;
+            switch (plan)
+            {
+                case "Quarterly":
+                    selectedType = MembershipType.Quarterly;
+                    customer.MembershipExpiry = DateTime.UtcNow.AddMonths(3);
+                    break;
+                case "Yearly":
+                    selectedType = MembershipType.Yearly;
+                    customer.MembershipExpiry = DateTime.UtcNow.AddYears(1);
+                    break;
+                default:
+                    customer.MembershipExpiry = DateTime.UtcNow.AddMonths(1);
+                    break;
+            }
 
-    // ⬇ 添加 payment 记录
-    var payment = new Payment
-    {
-        CustomerId = customer.Id,
-        Price = PricingPlans.GetPrice(selectedType),
-        PaymentMethod = "Online",
-        PaymentDate = DateTime.UtcNow
-    };
+            customer.MembershipType = selectedType;
 
-    _dbContext.Payments.Add(payment);
-    _dbContext.Update(customer);
-    await _dbContext.SaveChangesAsync();
+            // ⬇ 添加 payment 记录
+            var payment = new Payment
+            {
+                CustomerId = customer.Id,
+                Price = PricingPlans.GetPrice(selectedType),
+                PaymentMethod = "Online",
+                PaymentDate = DateTime.UtcNow
+            };
 
-    TempData["Toast"] = $"Membership renewed as {plan} plan!";
-    return RedirectToAction("Membership");
-}
+            _dbContext.Payments.Add(payment);
+            _dbContext.Update(customer);
+            await _dbContext.SaveChangesAsync();
+
+            TempData["Toast"] = $"Membership renewed as {plan} plan!";
+            return RedirectToAction("Membership");
+        }
 
 
 

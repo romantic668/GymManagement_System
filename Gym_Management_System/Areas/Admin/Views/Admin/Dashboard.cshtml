@@ -5,7 +5,7 @@
 
 @using GymManagement.Areas.Admin.Models
 @model AdminDashboardViewModel
-
+@using System.Globalization;
 @{
     Dictionary<SessionCategory, string> categoryIcons = new()
 {
@@ -151,10 +151,10 @@
     var date = kv.Key;
     var sessions = kv.Value;
     string title = date.Date == DateTime.Today
-    ? "Today's sessions (" + date.ToString("MMM dd, yyyy") + ")"
+    ? "Today's sessions (" + date.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) + ")"
     : (date.Date == DateTime.Today.AddDays(1)
-    ? "Tomorrow's sessions (" + date.ToString("MMM dd, yyyy") + ")"
-    : "Sessions (" + date.ToString("MMM dd, yyyy") + ")");
+    ? "Tomorrow's sessions (" + date.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) + ")"
+    : "Sessions (" + date.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) + ")");
 
     <div class="card p-4 mb-4">
         <div class="row align-items-center mb-3">
@@ -162,7 +162,7 @@
                 <h5 class="fw-bold text-success mb-0">@title</h5>
             </div>
             <div class="col-md-3 col-12 text-md-right text-left mt-2 mt-md-0">
-                <a asp-action="CreateSession" asp-controller="Admin" asp-route-date="@date.ToString("yyyy-MM-dd")"
+                <a asp-action="CreateSession" asp-controller="Admin" asp-route-date="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)"
                     class="btn btn-success btn-sm rounded-pill px-4">
                     + Create a session
                 </a>
@@ -195,7 +195,7 @@
                                     @s.SessionName
                                 </span>
                             </td>
-                            <td>@s.SessionDateTime.ToString("HH:mm / MMM dd, yyyy")</td>
+                            <td>@s.SessionDateTime.ToString("HH:mm / MMM dd, yyyy", CultureInfo.InvariantCulture)</td>
                             <td>@s.Trainer?.Name</td>
                             <td>@s.Trainer?.GymBranch?.BranchName</td>
                             <td>@s.Room?.RoomName</td>

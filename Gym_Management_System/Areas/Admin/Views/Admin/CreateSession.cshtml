@@ -1,4 +1,5 @@
 @model GymManagement.Areas.Admin.Models.CreateSessionViewModel
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Create a session";
     Layout = "../Shared/_AdminLayout.cshtml";
@@ -131,7 +132,7 @@
                     <label class="col-sm-3 col-form-label">Session Time</label>
                     <div class="col-sm-9">
                         <input asp-for="SessionDateTime" class="form-control" type="datetime-local"
-                            min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                            min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture)" required />
                         <span asp-validation-for="SessionDateTime" class="text-danger"></span>
                     </div>
                 </div>

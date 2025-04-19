@@ -1,5 +1,6 @@
 @model GymManagement.ViewModels.ManageBookingsViewModel
 @using GymManagement.Models
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Manage Bookings";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -102,7 +103,7 @@
                 <select name="date" class="form-control d-inline w-auto">
                     <option value="">All Dates</option>
                     @foreach (var option in dateOptions) {
-                        var dstr = option.ToString("yyyy-MM-dd");
+                        var dstr = option.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                         var selected = selectedDate == dstr ? "selected" : "";
                         @:<option value="@dstr" @selected>@dstr</option>
                     }
@@ -138,7 +139,7 @@
                         <td>@b.Customer.Name</td>
                         <td>@b.Session.GymClass.ClassName</td>
                         <td>@b.Session.Trainer.Name</td>
-                        <td>@b.Session.SessionDateTime.ToString("MMM/dd/yyyy HH:mm")</td>
+                        <td>@b.Session.SessionDateTime.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>@b.Status</td>
                         <td>
                             @if (b.Status == BookingStatus.Pending)

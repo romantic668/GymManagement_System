@@ -1,4 +1,5 @@
 @model List<GymManagement.ViewModels.GymClassViewModel>
+@using System.Globalization; 
 @{
     ViewData["Title"] = "My Gym Classes";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -75,7 +76,7 @@
                                 <h4 class="fw-bold text-white mb-2">@item.ClassName</h4>
                                 <p class="text-light small">@item.Description</p>
                                 <p class="text-info mb-0"><strong>Duration:</strong> @item.Duration mins</p>
-                                <p class="text-info"><strong>Available:</strong> @item.AvailableTime.ToString("yyyy-MM-dd")</p>
+                                <p class="text-info"><strong>Available:</strong> @item.AvailableTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</p>
                             </div>
 
                             <div>
@@ -106,7 +107,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label>Available Time</label>
-                                        <input class="form-control" type="date" name="AvailableTime" value="@item.AvailableTime.ToString("yyyy-MM-dd")" />
+                                        <input class="form-control" type="date" name="AvailableTime" value="@item.AvailableTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" />
                                     </div>
                                     <div class="mb-3">
                                         <label>Duration (mins)</label>

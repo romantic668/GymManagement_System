@@ -1,5 +1,6 @@
 @using GymManagement.Models
 @using GymManagement.Helpers
+@using System.Globalization; 
 @model GymManagement.ViewModels.MembershipViewModel
 
 @{
@@ -46,7 +47,7 @@
             </p>
 
             <p>
-                Expires On: <strong>@Model.ExpiryDate?.ToString("yyyy-MM-dd")</strong>
+                Expires On: <strong>@Model.ExpiryDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</strong>
             </p>
 
             <p>
@@ -106,7 +107,7 @@
                     <tr>
                         <td>$@p.Price</td>
                         <td>@p.PaymentMethod</td>
-                        <td>@p.PaymentDate.ToString("yyyy-MM-dd")</td>
+                        <td>@p.PaymentDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</td>
                     </tr>
                 }
             </tbody>

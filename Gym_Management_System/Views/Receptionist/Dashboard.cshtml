@@ -1,5 +1,5 @@
 @model GymManagement.ViewModels.ReceptionistDashboardViewModel
-
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Receptionist Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -101,7 +101,7 @@
                     <tr>
                         <td>@b.Customer.Name</td>
                         <td>@b.Session.SessionName</td>
-                        <td>@b.Session.SessionDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@b.Session.SessionDateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>@b.Session.Room?.RoomName</td>
                         <td>@b.Status</td>
                         <td>

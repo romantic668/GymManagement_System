@@ -1,5 +1,5 @@
 @model GymManagement.ViewModels.TimetableBookingViewModel
-
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Class Timetable Booking";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,7 +24,7 @@
 
         @foreach (var group in grouped)
         {
-            <h4 class="text-warning mb-3">@group.Key.ToString("yyyy-MM-dd")</h4>
+            <h4 class="text-warning mb-3">@group.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</h4>
             <table class="table table-bordered table-dark text-center">
                 <thead class="thead-light">
                     <tr>

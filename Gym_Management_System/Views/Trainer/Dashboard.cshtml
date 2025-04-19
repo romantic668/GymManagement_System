@@ -1,4 +1,5 @@
 @model GymManagement.ViewModels.TrainerDashboardViewModel
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Trainer Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -96,7 +97,7 @@
                     <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
                         <div>
                             <h5 class="card-title">@session.GymClass?.ClassName</h5>
-                            <p class="card-text"><strong>Date:</strong> @session.SessionDateTime.ToString("yyyy-MM-dd HH:mm")</p>
+                            <p class="card-text"><strong>Date:</strong> @session.SessionDateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</p>
                             <p class="card-text"><strong>Room:</strong> @session.Room?.RoomName</p>
                         </div>
                         <button class="btn btn-info btn-sm mt-2" data-toggle="modal" data-target="#sessionModal-@session.SessionId">View Details</button>
@@ -117,7 +118,7 @@
                         <div class="modal-body">
                             <p><strong>Class:</strong> @session.SessionName</p>
                             <p><strong>Room:</strong> @session.Room?.RoomName</p>
-                            <p><strong>Date:</strong> @session.SessionDateTime.ToString("yyyy-MM-dd HH:mm")</p>
+                            <p><strong>Date:</strong> @session.SessionDateTime.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</p>
                             <p><strong>Bookings:</strong> @(session.Bookings?.Count ?? 0)</p>
                             <hr />
                             <h6>Booked Customers:</h6>

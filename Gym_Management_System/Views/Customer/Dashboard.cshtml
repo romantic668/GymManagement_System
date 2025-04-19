@@ -1,4 +1,5 @@
 @model GymManagement.ViewModels.CustomerDashboardViewModel
+@using System.Globalization; 
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -141,10 +142,10 @@
         </span>
     </div>
     <div class="membership-info">
-        Subscribed Since: <strong>@Model.SubscriptionDate.ToString("yyyy-MM-dd")</strong>
+        Subscribed Since: <strong>@Model.SubscriptionDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</strong>
     </div>
     <div class="membership-info">
-        Expires On: <strong>@Model.MembershipExpiry?.ToString("yyyy-MM-dd")</strong>
+        Expires On: <strong>@Model.MembershipExpiry?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</strong>
     </div>
 </div>
 
@@ -206,7 +207,7 @@
                         <td>@b.TrainerName</td>
                         <td>@b.RoomName</td>
                         <td>@b.Category</td>
-                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm")</td>
+                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>
                             <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
                                                  b.Status == "Pending" ? "badge-warning" :
@@ -288,7 +289,7 @@
                         <td>@b.TrainerName</td>
                         <td>@b.RoomName</td>
                         <td>@b.Category</td>
-                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm")</td>
+                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>
                             <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
                                                  b.Status == "Pending" ? "badge-warning" :

@@ -1,15 +1,24 @@
-using GymManagement.Models;  
-using GymManagement.ViewModels;
+using System;
+using System.Collections.Generic;
+
 namespace GymManagement.ViewModels
 {
-  public class CustomerDashboardViewModel
-  {
-    public required string Name { get; set; }
-    public required string MembershipType { get; set; }
-    public required DateTime SubscriptionDate { get; set; }
-    public required List<BookingViewModel> UpcomingBookings { get; set; }
-    public required List<PaymentViewModel> Payments { get; set; }
-    public required string MembershipStatus { get; set; }
-    public required List<Booking> Bookings { get; set; } // 添加 Bookings 属性
-  }
+    public class CustomerDashboardViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string MembershipStatus { get; set; } = string.Empty;
+        public string MembershipType { get; set; } = string.Empty;
+        public DateTime SubscriptionDate { get; set; }
+        public DateTime? MembershipExpiry { get; set; }  // 🔹 加这个
+
+        public string ProfileImageName { get; set; } = "default.png";
+
+        public List<PaymentViewModel> Payments { get; set; } = new();
+
+        public List<BookingViewModel> UpcomingBookings { get; set; } = new();
+        public List<BookingViewModel> PastBookings { get; set; } = new();
+
+        public int TotalPages { get; set; }
+        public int CurrentPage { get; set; }
+    }
 }

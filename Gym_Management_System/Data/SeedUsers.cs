@@ -91,11 +91,35 @@ namespace GymManagement.Data
                 "Ulysses Gao", "Vera Shen", "Will Liang", "Xia Zhou", "Yoyo Guo"
             };
 
+            var membershipTypes = new[] { MembershipType.Monthly, MembershipType.Quarterly, MembershipType.Yearly };
+            var membershipStatuses = new[] { MembershipStatus.Active, MembershipStatus.Expired, MembershipStatus.Suspended };
+            var paymentMethods = new[] { "Credit Card", "Cash", "Debit", "Online" };
+            var rnd = new Random();
+
             for (int i = 0; i < customerNames.Length; i++)
             {
                 var email = $"{customerNames[i].ToLower().Replace(" ", "")}@cust.com";
                 if (await userManager.FindByEmailAsync(email) == null)
                 {
+                    // 🎯 类型 + 状态
+                    var type = membershipTypes[i % membershipTypes.Length];
+                    var status = membershipStatuses[i % membershipStatuses.Length];
+
+                    // 🕒 有效期逻辑
+                    DateTime? expiry = status switch
+                    {
+                        MembershipStatus.Active => type switch
+                        {
+                            MembershipType.Monthly => DateTime.UtcNow.AddMonths(1),
+                            MembershipType.Quarterly => DateTime.UtcNow.AddMonths(3),
+                            MembershipType.Yearly => DateTime.UtcNow.AddYears(1),
+                            _ => null
+                        },
+                        MembershipStatus.Expired => DateTime.UtcNow.AddDays(-rnd.Next(5, 30)), // 已过期日期
+                        MembershipStatus.Suspended => null, // 暂停状态不设定过期
+                        _ => null
+                    };
+
                     var user = new Customer
                     {
                         UserName = email.Split('@')[0],
@@ -103,15 +127,44 @@ namespace GymManagement.Data
                         Name = customerNames[i],
                         JoinDate = DateTime.UtcNow,
                         DOB = new DateTime(1990 + (i % 15), 5, (i % 28) + 1),
-                        MembershipType = "Monthly",
+                        MembershipType = type,
+                        MembershipStatus = status,
+                        MembershipExpiry = expiry,
                         SubscriptionDate = DateTime.UtcNow,
                         GymBranchId = branches[i % 5].BranchId
                     };
+
                     var result = await userManager.CreateAsync(user, "Customer@123");
                     if (result.Succeeded)
+                    {
                         await userManager.AddToRoleAsync(user, "Customer");
+
+                        // 💳 只有 Active 和 Expired 才生成付款记录
+                        if (status == MembershipStatus.Active || status == MembershipStatus.Expired)
+                        {
+                            decimal price = type switch
+                            {
+                                MembershipType.Monthly => 59.99m,
+                                MembershipType.Quarterly => 149.99m,
+                                MembershipType.Yearly => 499.99m,
+                                _ => 0m
+                            };
+
+                            var payment = new Payment
+                            {
+                                CustomerId = user.Id,
+                                Price = price,
+                                PaymentMethod = paymentMethods[rnd.Next(paymentMethods.Length)],
+                                PaymentDate = status == MembershipStatus.Expired ? DateTime.UtcNow.AddMonths(-1) : DateTime.UtcNow
+                            };
+
+                            context.Payments.Add(payment);
+                        }
+                    }
                 }
             }
+
+
 
             // ✅ Receptionists
             var receptionistNames = new[] { "Sophie Desk", "Liam Front", "Emily Welcome", "Jay Counter", "Nina Greet" };

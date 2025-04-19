@@ -1,13 +1,115 @@
 @using GymManagement.Models
-@using GymManagement.ViewModels
-@model GymManagement.Models.Customer
-<h2>Your Membership</h2>
-<p>Status: <strong>@Model.MembershipStatus</strong></p>
-<p>Expires: <strong>@Model.MembershipExpiry?.ToString("yyyy-MM-dd")</strong></p>
+@using GymManagement.Helpers
+@model GymManagement.ViewModels.MembershipViewModel
 
-@if (Model.MembershipStatus == "Expired")
-{
-    <form asp-action="RenewMembership" method="post">
-        <button type="submit" class="btn btn-success">Renew Now</button>
-    </form>
+@{
+    ViewData["Title"] = "My Membership";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var plans = new[] { MembershipType.Monthly, MembershipType.Quarterly, MembershipType.Yearly };
 }
+
+<section class="breadcrumb-section set-bg" data-setbg="@Url.Content("~/img/breadcrumb-bg.jpg")" style="background-image: url('@Url.Content("~/img/breadcrumb-bg.jpg")');">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>Membership Info</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Home</a>
+                        <span>Membership</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="services-section spad">
+    <div class="container">
+        @if (TempData["Toast"] != null)
+        {
+            <div class="alert alert-success text-center">@TempData["Toast"]</div>
+        }
+
+        <div class="text-center mb-5">
+            <h2 class="text-warning font-weight-bold mb-3">@Model.Name</h2>
+
+            <p>Membership Type: <strong>@Model.MembershipType</strong></p>
+
+            <p>
+                Status:
+                <span class="badge badge-@(Model.MembershipStatus == "Active" ? "success" :
+                                           Model.MembershipStatus == "Expired" ? "danger" :
+                                           "secondary")">
+                    @Model.MembershipStatus
+                </span>
+            </p>
+
+            <p>
+                Expires On: <strong>@Model.ExpiryDate?.ToString("yyyy-MM-dd")</strong>
+            </p>
+
+            <p>
+                Remaining Days: <strong class="text-info">@Model.RemainingDays</strong>
+            </p>
+        </div>
+
+        @if (Model.MembershipStatus == "Expired")
+        {
+            <div class="section-title text-center">
+                <span>Renew Your Membership</span>
+                <h2>Choose Your Pricing Plan</h2>
+            </div>
+            <div class="row justify-content-center">
+                @foreach (var plan in plans)
+                {
+                    var price = PricingPlans.GetPrice(plan);
+                    var label = PricingPlans.GetDisplayName(plan);
+                    var name = plan.ToString();
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="ps-item text-center bg-dark text-light p-4">
+                            <h3 class="text-warning">@name Plan</h3>
+                            <div class="pi-price my-3">
+                                <h2 class="text-orange">$@price</h2>
+                                <span>@label</span>
+                            </div>
+                            <ul class="list-unstyled text-light">
+                                <li>Free riding</li>
+                                <li>Unlimited equipments</li>
+                                <li>Personal trainer</li>
+                                <li>Weight losing classes</li>
+                                <li>Month to mouth</li>
+                                <li>No time restriction</li>
+                            </ul>
+                            <form asp-action="RenewMembership" method="post">
+                                <input type="hidden" name="plan" value="@plan" />
+                                <button type="submit" class="primary-btn pricing-btn mt-3">Renew Now</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <h4 class="text-center mb-3 text-light">Payment History</h4>
+        <table class="table table-bordered table-striped text-center bg-white">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Payments)
+                {
+                    <tr>
+                        <td>$@p.Price</td>
+                        <td>@p.PaymentMethod</td>
+                        <td>@p.PaymentDate.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

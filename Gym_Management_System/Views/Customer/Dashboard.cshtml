@@ -1,32 +1,327 @@
-<!-- Details.cshtml in GymManagement/Views/Customer folder-->
-@using GymManagement.Models
-@using GymManagement.ViewModels
 @model GymManagement.ViewModels.CustomerDashboardViewModel
-
 @{
-  int counter = 1;
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var selectedCategory = Context.Request.Query["category"];
+    var selectedTrainer = Context.Request.Query["trainer"];
+    var selectedStatus = Context.Request.Query["status"];
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
 }
 
-<div>
-    <h2>Customer Details</h2>
-    <p><strong>Name:</strong> @Model.Name</p>
-    <p><strong>Membership Type:</strong> @Model.MembershipType</p>
-    <p><strong>Membership Status:</strong> @Model.MembershipStatus</p>
-    <p><strong>Subscription Date:</strong> @Model.SubscriptionDate.ToString("yyyy-MM-dd")</p>
-
-    <h3>Payments:</h3>
-    <ul>
-    @foreach (var payment in Model.Payments)
-    {
-        <li>@payment.PaymentMethod - @payment.Price</li>
-    }
-    </ul>
-
-    <h3>Bookings:</h3>
-    <ul>
-    @foreach (var booking in Model.Bookings)
-    {
-        <li>Session ID: @booking.SessionId</li>
-    }
-    </ul>
+<!-- 🔄 Loader Spinner -->
+<div id="loader" style="display: none;">
+    <div class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
 </div>
+
+<style>
+    .spinner-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.4);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #ffc107;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .toast-msg {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        min-width: 220px;
+        z-index: 9999;
+        animation: fadeOut 4s forwards;
+    }
+
+    @@keyframes fadeOut {
+        0% { opacity: 1; }
+        70% { opacity: 1; }
+        100% { opacity: 0; display: none; }
+    }
+
+    .profile-container {
+        max-width: 800px;
+        margin: 60px auto 20px auto;
+        text-align: center;
+    }
+
+    .profile-title {
+        font-size: 48px;
+        font-weight: 900;
+        color: #ffcc00;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 3px black;
+    }
+
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 6px solid #ffcc00;
+        margin-bottom: 30px;
+        box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+    }
+
+    .membership-info {
+        font-size: 1.2rem;
+        color: #fff;
+        margin-top: 10px;
+    }
+
+    .membership-info strong {
+        color: #ffc107;
+    }
+
+    .badge-membership {
+        font-size: 1rem;
+        font-weight: bold;
+        padding: 5px 12px;
+        border-radius: 12px;
+    }
+</style>
+
+<section class="breadcrumb-section set-bg" data-setbg="@Url.Content("~/img/breadcrumb-bg.jpg")" style="background-image: url('@Url.Content("~/img/breadcrumb-bg.jpg")');">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>My Dashboard</h2>
+                    <div class="bt-option">
+                        <a asp-controller="Home" asp-action="Index">Home</a>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="profile-container">
+    <div class="profile-title">@Model.Name</div>
+    <img src="/uploads/profile/@Model.ProfileImageName" class="profile-avatar" alt="Profile Picture" />
+    <div class="membership-info">
+        Membership: <strong>@Model.MembershipType</strong>
+        <span class="badge badge-membership badge-@(GetBadgeClass(Model.MembershipStatus))">
+            @Model.MembershipStatus
+        </span>
+    </div>
+    <div class="membership-info">
+        Subscribed Since: <strong>@Model.SubscriptionDate.ToString("yyyy-MM-dd")</strong>
+    </div>
+    <div class="membership-info">
+        Expires On: <strong>@Model.MembershipExpiry?.ToString("yyyy-MM-dd")</strong>
+    </div>
+</div>
+
+<section class="services-section spad">
+    <div class="container">
+
+        <!-- 🔍 筛选器 -->
+        <form method="get" asp-action="Dashboard" class="form-inline justify-content-center mb-4">
+            <select name="category" class="form-control mx-2">
+                <option value="">All Categories</option>
+                @foreach (var cat in (List<string>)ViewBag.CategoryOptions)
+                {
+                    var selected = ViewBag.SelectedCategory == cat ? "selected" : null;
+                    <option value="@cat" selected="@selected">@cat</option>
+                }
+            </select>
+            <select name="trainer" class="form-control mx-2">
+                <option value="">All Trainers</option>
+                @foreach (var t in (List<string>)ViewBag.TrainerOptions)
+                {
+                    var selected = ViewBag.SelectedTrainer == t ? "selected" : null;
+                    <option value="@t" selected="@selected">@t</option>
+                }
+            </select>
+            <select name="status" class="form-control mx-2">
+                <option value="">All Statuses</option>
+                @foreach (var s in (List<string>)ViewBag.StatusOptions)
+                {
+                    var selected = ViewBag.SelectedStatus == s ? "selected" : null;
+                    <option value="@s" selected="@selected">@s</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-warning mx-2">Apply</button>
+            <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline-secondary mx-2">Reset</a>
+        </form>
+
+        <!-- ✅ Upcoming Bookings -->
+        <div class="section-title text-center mt-5">
+            <h2>Upcoming Bookings</h2>
+        </div>
+
+        <table class="table table-bordered table-striped table-hover bg-white text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Class</th>
+                    <th>Trainer</th>
+                    <th>Room</th>
+                    <th>Category</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model.UpcomingBookings)
+                {
+                    <tr>
+                        <td>@b.ClassName</td>
+                        <td>@b.TrainerName</td>
+                        <td>@b.RoomName</td>
+                        <td>@b.Category</td>
+                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
+                                                 b.Status == "Pending" ? "badge-warning" :
+                                                 b.Status == "Canceled" ? "badge-danger" :
+                                                 b.Status == "CheckedIn" ? "badge-secondary" : "badge-light")">
+                                @b.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (b.Status == "Canceled")
+                            {
+                                <form asp-action="BookAgain" method="post" class="d-inline">
+                                    <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success" onclick="disableButton(this)">Book</button>
+                                </form>
+                            }
+                            else if (b.Status == "Pending" || b.Status == "Confirmed")
+                            {
+                                <form asp-action="CancelBooking" method="post" class="d-inline">
+                                    <input type="hidden" name="bookingId" value="@b.BookingId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="disableButton(this)">Cancel</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="text-center mt-4">
+            @if (totalPages > 1)
+            {
+                int maxPagesToShow = 5;
+                int startPage = Math.Max(1, currentPage - 2);
+                int endPage = Math.Min(totalPages, currentPage + 2);
+
+                if (startPage > 1)
+                {
+                    <a class="btn btn-sm btn-outline-warning mx-1" href="@Url.Action("Dashboard", new { category = selectedCategory, trainer = selectedTrainer, status = selectedStatus, page = 1 })">1</a>
+                    if (startPage > 2) { <span class="mx-1">...</span>; }
+                }
+
+                for (int i = startPage; i <= endPage; i++)
+                {
+                    <a class="btn btn-sm btn-outline-warning mx-1 @(i == currentPage ? "font-weight-bold" : "")"
+                       href="@Url.Action("Dashboard", new { category = selectedCategory, trainer = selectedTrainer, status = selectedStatus, page = i })">@i</a>
+                }
+
+                if (endPage < totalPages)
+                {
+                    if (endPage < totalPages - 1) { <span class="mx-1">...</span>; }
+                    <a class="btn btn-sm btn-outline-warning mx-1" href="@Url.Action("Dashboard", new { category = selectedCategory, trainer = selectedTrainer, status = selectedStatus, page = totalPages })">@totalPages</a>
+                }
+            }
+        </div>
+
+        <!-- 🔴 Past Bookings -->
+        <div class="section-title text-center mt-5">
+            <h2>Past Bookings</h2>
+        </div>
+
+        <table class="table table-bordered table-striped table-hover bg-white text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Class</th>
+                    <th>Trainer</th>
+                    <th>Room</th>
+                    <th>Category</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model.PastBookings)
+                {
+                    <tr>
+                        <td>@b.ClassName</td>
+                        <td>@b.TrainerName</td>
+                        <td>@b.RoomName</td>
+                        <td>@b.Category</td>
+                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
+                                                 b.Status == "Pending" ? "badge-warning" :
+                                                 b.Status == "Canceled" ? "badge-danger" :
+                                                 b.Status == "CheckedIn" ? "badge-secondary" : "badge-light")">
+                                @b.Status
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Toast Message -->
+        @if (TempData["Toast"] != null)
+        {
+            <div class="alert alert-success toast-msg text-center">
+                @TempData["Toast"]
+            </div>
+        }
+
+    </div>
+</section>
+
+@functions {
+    string GetBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Active" => "success",
+            "Expired" => "danger",
+            "Suspended" => "secondary",
+            _ => "light"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", () => {
+                document.getElementById("loader")?.style?.setProperty("display", "block");
+            });
+        });
+
+        function disableButton(btn) {
+            btn.disabled = true;
+            btn.innerHTML = 'Please wait...';
+            btn.closest("form").submit();
+        }
+    </script>
+}

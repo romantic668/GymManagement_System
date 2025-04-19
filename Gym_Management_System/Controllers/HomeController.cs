@@ -20,27 +20,34 @@ namespace GymManagement.Controllers
 
         // 首页
         public async Task<IActionResult> Index()
+{
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
         {
-            if (User.Identity?.IsAuthenticated == true)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                var roles = await _userManager.GetRolesAsync(user);
-
-                if (roles.Contains("Admin"))
-                    return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
-
-                if (roles.Contains("Trainer"))
-                    return RedirectToAction("Dashboard", "Trainer");
-
-                if (roles.Contains("Receptionist"))
-                    return RedirectToAction("Dashboard", "Receptionist");
-
-                if (roles.Contains("Customer"))
-                    return RedirectToAction("Dashboard", "Customer");
-            }
-
-            return View(); // fallback for not logged-in
+            // 说明当前登录的 User 无法映射为数据库中 User 表的记录
+            _logger.LogWarning("User is authenticated but no matching record found in database.");
+            return RedirectToAction("Login", "Account");
         }
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles.Contains("Admin"))
+            return RedirectToAction("Dashboard", "Admin", new { area = "Admin" });
+
+        if (roles.Contains("Trainer"))
+            return RedirectToAction("Dashboard", "Trainer");
+
+        if (roles.Contains("Receptionist"))
+            return RedirectToAction("Dashboard", "Receptionist");
+
+        if (roles.Contains("Customer"))
+            return RedirectToAction("Dashboard", "Customer");
+    }
+
+    return View(); // fallback for not logged-in
+}
 
         // 课程时间表页
         [HttpGet]

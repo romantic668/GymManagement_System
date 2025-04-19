@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+
 using GymManagement.Data;
 using GymManagement.Models;
 using GymManagement.Services;
@@ -31,11 +33,23 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-  options.LoginPath = "/Account/Login";
-  options.AccessDeniedPath = "/Account/AccessDenied";
-  options.ExpireTimeSpan = TimeSpan.FromDays(14); // <-- 关键点！
-  options.SlidingExpiration = true;               // 可选，刷新时自动续命
-  options.Cookie.IsEssential = true;              // 确保不会被阻止
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
+    options.Cookie.IsEssential = true;
+
+    // ✅ 自动清除失效用户 Cookie
+    options.Events.OnValidatePrincipal = async context =>
+    {
+        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
+        var user = await userManager.GetUserAsync(context.Principal);
+        if (user == null)
+        {
+            context.RejectPrincipal();
+            await context.HttpContext.SignOutAsync();
+        }
+    };
 });
 
 

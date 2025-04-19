@@ -3,6 +3,48 @@
     ViewData["Title"] = "Create a session";
     Layout = "../Shared/_AdminLayout.cshtml";
 }
+<style>
+    .form-container {
+        max-width: 40rem; 
+        padding-left: 2rem;
+    }
+
+    .form-control,
+    .form-select {
+        max-width: 25rem; 
+        width: 100%;
+    }
+
+    label.form-label {
+        font-weight: 500;
+    }
+    .form-control,
+    .form-select {
+        max-width: 25rem;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        background-color: #fff;
+        background-clip: padding-box;
+        box-shadow: inset 0 0 0 transparent;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    .form-select {
+        appearance: none; 
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+</style>
+
 
 <div class="p-4">
     <div class="bg-white shadow-sm rounded-4 p-5">
@@ -10,91 +52,100 @@
 
         <h3 class="mb-4">Create a session</h3>
 
-        <form asp-action="CreateSession" asp-controller="Admin" method="post" class="needs-validation" novalidate>
-            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="form-container">
+            <form asp-action="CreateSession" asp-controller="Admin" method="post" class="needs-validation" novalidate>
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-            <div class="row">
-                <div class="col-md-6"><!-- Session Name -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Session Name</label>
-                        <input asp-for="SessionName" class="form-control" placeholder="e.g. Morning Yoga with Ella"
-                            required />
+                <!-- Session Name -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Session Name</label>
+                    <div class="col-sm-9">
+                        <input asp-for="SessionName" class="form-control" placeholder="e.g. Morning Yoga with Ella" required />
                         <span asp-validation-for="SessionName" class="text-danger"></span>
                     </div>
+                </div>
 
-
-
-
-                    <!-- Gym Class -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Gym class</label>
+                <!-- Gym Class -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Gym Class</label>
+                    <div class="col-sm-9">
                         <select asp-for="GymClassId" asp-items="Model.GymClassList" class="form-select" required>
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="GymClassId" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Trainer -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Trainer</label>
+                <!-- Trainer -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Trainer</label>
+                    <div class="col-sm-9">
                         <select asp-for="TrainerId" asp-items="Model.TrainerList" class="form-select" required>
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="TrainerId" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Branch -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Branch</label>
-                        <input id="branchNameDisplay" type="text" class="form-control"
-                            value="@(Model.BranchName ?? "N/A")" readonly />
-
+                <!-- Branch -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Branch</label>
+                    <div class="col-sm-9">
+                        <input id="branchNameDisplay" type="text" class="form-control" value="@(Model.BranchName ?? "N/A")" readonly />
                     </div>
+                </div>
 
-
-                    <!-- Category -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Category</label>
+                <!-- Category -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Category</label>
+                    <div class="col-sm-9">
                         <select asp-for="Category" asp-items="Model.CategoryList" class="form-select" required>
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="Category" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Room -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Room</label>
+                <!-- Room -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Room</label>
+                    <div class="col-sm-9">
                         <select asp-for="RoomId" asp-items="Model.RoomList" class="form-select" required>
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="RoomId" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Capacity -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">Capacity</label>
+                <!-- Capacity -->
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label">Capacity</label>
+                    <div class="col-sm-9">
                         <input asp-for="Capacity" class="form-control" readonly />
                         <span asp-validation-for="Capacity" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Session Time -->
-                    <div class="form-group mb-4">
-                        <label class="form-label">Session time</label>
+                <!-- Session Time -->
+                <div class="mb-4 row">
+                    <label class="col-sm-3 col-form-label">Session Time</label>
+                    <div class="col-sm-9">
                         <input asp-for="SessionDateTime" class="form-control" type="datetime-local"
                             min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
                         <span asp-validation-for="SessionDateTime" class="text-danger"></span>
                     </div>
+                </div>
 
-                    <!-- Buttons -->
-                    <div class="form-group d-flex justify-content-between">
+                <!-- Buttons -->
+                <div class="row">
+                    <div class="offset-sm-2 col-sm-9 justify-content-between">
                         <button type="submit" class="btn btn-dark px-4">Save & Publish</button>
                         <a asp-area="Admin" asp-controller="Admin" asp-action="Dashboard"
-                            class="btn btn-outline-secondary px-4">Cancel</a>
+                        class="btn btn-outline-secondary px-4">Cancel</a>
                     </div>
-
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using GymManagement.Models;
 using GymManagement.Data;
+using GymManagement.Helpers;
 using GymManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -175,29 +176,42 @@ public async Task<IActionResult> RenewMembership(string plan)
     customer.MembershipStatus = MembershipStatus.Active;
     customer.SubscriptionDate = DateTime.UtcNow;
 
-    // 根据套餐类型更新到期时间 & 类型
+    // 设置类型和时间
+    MembershipType selectedType = MembershipType.Monthly;
     switch (plan)
     {
         case "Quarterly":
-            customer.MembershipType = MembershipType.Quarterly;
+            selectedType = MembershipType.Quarterly;
             customer.MembershipExpiry = DateTime.UtcNow.AddMonths(3);
             break;
         case "Yearly":
-            customer.MembershipType = MembershipType.Yearly;
+            selectedType = MembershipType.Yearly;
             customer.MembershipExpiry = DateTime.UtcNow.AddYears(1);
             break;
         default:
-            customer.MembershipType = MembershipType.Monthly;
             customer.MembershipExpiry = DateTime.UtcNow.AddMonths(1);
             break;
     }
 
+    customer.MembershipType = selectedType;
+
+    // ⬇ 添加 payment 记录
+    var payment = new Payment
+    {
+        CustomerId = customer.Id,
+        Price = PricingPlans.GetPrice(selectedType),
+        PaymentMethod = "Online",
+        PaymentDate = DateTime.UtcNow
+    };
+
+    _dbContext.Payments.Add(payment);
     _dbContext.Update(customer);
     await _dbContext.SaveChangesAsync();
 
     TempData["Toast"] = $"Membership renewed as {plan} plan!";
     return RedirectToAction("Membership");
 }
+
 
 
 

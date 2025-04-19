@@ -1,11 +1,17 @@
-using GymManagement.Models; // 别忘了加这个引用
-
+using GymManagement.Models; 
 public class SessionViewModel
 {
-  public required string ClassName { get; set; }
+  public int SessionId { get; set; }
+  public string SessionName { get; set; }= "";
+  public DateTime SessionDateTime { get; set; }
+  public Trainer Trainer { get; set; }= null!;
+  public bool IsBookedByCurrentUser { get; set; }
+
+  public required string ClassName { get; set; }= "";
   public required DateTime SessionDate { get; set; }
-  public required string RoomName { get; set; }
+  public required string RoomName { get; set; }= "";
   public required int TotalBookings { get; set; }
 
-  public required SessionCategory Category { get; set; } // ✅ 新增字段
+  public required SessionCategory Category { get; set; }
 }
+

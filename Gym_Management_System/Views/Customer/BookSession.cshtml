@@ -39,6 +39,12 @@
         color: #000;
     }
 
+    .btn-booked {
+        background-color: #434242;
+        color: #fff;
+        border: none;
+        cursor: default;
+    }
     .page-link {
         background-color: #1a1a1a;
         color: #f36100;
@@ -91,6 +97,17 @@
         box-shadow: none;
         border-color: #ff9900;
     }
+    @@media (max-width: 576px) {
+        .pagination {
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+        }
+    }
+
 
 </style>
 
@@ -101,6 +118,7 @@
 <div class="row">
     @foreach (var session in Model.Sessions)
     {
+        var isBooked = session.IsBookedByCurrentUser;
         <div class="col-md-4 mb-4 d-flex">
             <div class="card session-card flex-fill">
                 <div class="card-body d-flex flex-column">
@@ -109,7 +127,14 @@
                         <strong>Trainer:</strong> @session.Trainer.Name <br />
                         <strong>Date & Time:</strong> @session.SessionDateTime.ToString("MMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture)
                     </p>
-                    <button type="button" class="btn btn-orange" onclick="bookSession(@session.SessionId)">Book</button>
+                    @if (isBooked)
+                    {
+                        <button type="button" class="btn btn-booked" disabled>Booked</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-orange" onclick="bookSession(@session.SessionId, this)">Book</button>
+                    }
                 </div>
             </div>
         </div>
@@ -149,7 +174,7 @@
         </ul>
 
         <!-- Jump to Page Form -->
-        <form asp-action="BookSession" method="get" class="d-flex align-items-center gap-2" style="margin-left:1rem">
+        <form asp-action="BookSession" method="get" class="d-flex align-items-center gap-2" style="margin:1rem">
             <input type="number" name="page" min="1" max="@Model.TotalPages"
                    class="form-control form-control-sm go-page-input"
                    placeholder="Page #" />
@@ -160,7 +185,7 @@
 
 @section Scripts {
 <script>
-    function bookSession(sessionId) {
+   function bookSession(sessionId, button) {
         fetch('/Customer/MarkBookingPending', {
             method: 'POST',
             headers: {
@@ -171,6 +196,10 @@
         .then(async response => {
             if (response.ok) {
                 showAlert("Session booked success pending!", "success");
+                button.classList.remove('btn-orange');
+                button.classList.add('btn-booked');
+                button.innerText = "Booked";
+                button.disabled = true;
             } else {
                 const errorData = await response.json();
                 console.error("Server error:", errorData);

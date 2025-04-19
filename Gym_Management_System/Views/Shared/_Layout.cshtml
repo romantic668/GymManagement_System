@@ -87,12 +87,28 @@
     .section-title h2,
     .section-title h3 {
         color: #ffc107;
+        width: fit-content;
     }
 
     .btn-success {
         background-color: #28a745;
         border-color: #28a745;
     }
+
+    .canvas-menu ul {
+        padding-left: 0;
+        list-style: none;
+    }
+    .canvas-menu ul li a {
+        color: #fff;
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #333;
+    }
+    .navbar-dark .navbar-nav .nav-link {
+        padding: 0.3rem 0.3rem;
+    }
+    
 </style>
 
 @RenderSection("Styles", required: false)
@@ -107,7 +123,6 @@
     </div>
 
     <!-- Offcanvas Menu Section Begin -->
-    <div class="offcanvas-menu-overlay"></div>
     <div class="offcanvas-menu-wrapper">
         <div class="canvas-close">
             <i class="fa fa-close"></i>
@@ -115,7 +130,7 @@
         <div class="canvas-search search-switch">
             <i class="fa fa-search"></i>
         </div>
-        <nav class="canvas-menu mobile-menu">
+        <nav class="canvas-menu">
             <ul>
                 <li><a href="./index.html">Home</a></li>
                 <li><a href="./about-us.html">About Us</a></li>
@@ -147,155 +162,104 @@
     <!-- Offcanvas Menu Section End -->
 
     <!-- Header Begin -->
-    <header class="header-section">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-lg-3">
-                    <div class="logo">
-                        <a asp-controller="Home" asp-action="Index">
-                            <img src="~/img/logo.png" alt="Gym Logo" />
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <nav class="nav-menu">
-                        <ul>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/img/logo.png" alt="Gym Logo" height="40" />
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             @if (showGuestMenu)
                             {
-                                <li class="@(currentController == "Home" && currentAction == "Index" ? "active" : "")">
-                                    <a asp-controller="Home" asp-action="Index">
-                                        <i class="fa fa-home me-1"></i> Home
-                                    </a>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "Home" && currentAction == "Index" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
                                 </li>
-                                <li class="@(currentController == "GymBranch" ? "active" : "")">
-                                    <a asp-controller="GymBranch" asp-action="Index">
-                                        <i class="fa fa-building me-1"></i> Gym Branches
-                                    </a>
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "GymBranch" ? "active" : "")" asp-controller="GymBranch" asp-action="Index">Gym Branches</a>
                                 </li>
                             }
-
-                            @if (!showGuestMenu)
+                            else
                             {
                                 if (User.IsInRole("Trainer"))
                                 {
-                                    <li class="@(currentController == "Trainer" && currentAction == "Dashboard" ? "active" : "")">
-                                        <a asp-controller="Trainer" asp-action="Dashboard">
-                                            <i class="fa fa-tachometer-alt me-1"></i> Dashboard
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Trainer" asp-action="Dashboard">Trainer Dashboard</a>
                                     </li>
-                                    <li class="@(currentController == "Trainer" && currentAction == "MyGymClasses" ? "active" : "")">
-                                        <a asp-controller="Trainer" asp-action="MyGymClasses">
-                                            <i class="fa fa-dumbbell me-1"></i> My Gym Classes
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "MyGymClasses" ? "active" : "")" asp-controller="Trainer" asp-action="MyGymClasses">My Gym Classes</a>
                                     </li>
                                 }
                                 else if (User.IsInRole("Receptionist"))
                                 {
-                                    <li class="@(currentController == "Receptionist" && currentAction == "Dashboard" ? "active" : "")">
-                                        <a asp-controller="Receptionist" asp-action="Dashboard">
-                                            <i class="fa fa-tachometer-alt me-1"></i> Dashboard
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Receptionist" asp-action="Dashboard">Receptionist Dashboard</a>
                                     </li>
-                                    <li class="@(currentController == "Receptionist" && currentAction == "ManageBookings" ? "active" : "")">
-                                        <a asp-controller="Receptionist" asp-action="ManageBookings">
-                                            <i class="fa fa-calendar-alt me-1"></i> Bookings
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "ManageBookings" ? "active" : "")" asp-controller="Receptionist" asp-action="ManageBookings">Bookings</a>
                                     </li>
-                                    <li class="@(currentController == "Receptionist" && currentAction == "CheckIn" ? "active" : "")">
-                                        <a asp-controller="Receptionist" asp-action="CheckIn">
-                                            <i class="fa fa-user-check me-1"></i> Check In
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "CheckIn" ? "active" : "")" asp-controller="Receptionist" asp-action="CheckIn">Check In</a>
                                     </li>
                                 }
                                 else if (User.IsInRole("Customer"))
                                 {
-                                    <li class="@(currentController == "Customer" && currentAction == "Dashboard" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="Dashboard">
-                                            <i class="fa fa-home me-1"></i> Customer Dashboard
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Dashboard" ? "active" : "")" asp-controller="Customer" asp-action="Dashboard">Dashboard</a>
                                     </li>
-                                    <li class="@(currentController == "Account" && currentAction == "Profile" ? "active" : "")">
-                                        <a asp-controller="Account" asp-action="ViewProfile">
-                                            <i class="fa fa-user me-1"></i> Profile
-                                        </a>
+                                    <li  class="nav-item" class="@(currentController == "Account" && currentAction == "Profile" ? "active" : "")">
+                                        <a class="nav-link @(currentController == "Account" && currentAction == "Profile" ? "active" : "")" asp-controller="Account" asp-action="ViewProfile">Profile</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "Bookings" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="Bookings">
-                                            <i class="fa fa-calendar-check me-1"></i> Bookings
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Bookings" ? "active" : "")" asp-controller="Customer" asp-action="Bookings">Bookings</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "BookSession" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="BookSession">
-                                            <i class="fa fa-plus-circle me-1"></i> Book Session
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "BookSession" ? "active" : "")" asp-controller="Customer" asp-action="BookSession">Book Session</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "Membership" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="Membership">
-                                            <i class="fa fa-id-card me-1"></i> Membership
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Payments" ? "active" : "")" asp-controller="Customer" asp-action="Payments">Payments</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "MyBookings" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="MyBookings">
-                                            <i class="fa fa-list-alt me-1"></i> My Bookings
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "Membership" ? "active" : "")" asp-controller="Customer" asp-action="Membership">Membership</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "Payments" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="Payments">
-                                            <i class="fa fa-credit-card me-1"></i> Payments
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "SessionCalendar" ? "active" : "")" asp-controller="Customer" asp-action="SessionCalendar">Session Calendar</a>
                                     </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "SessionCalendar" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="SessionCalendar">
-                                            <i class="fa fa-calendar me-1"></i> Session Calendar
-                                        </a>
-                                    </li>
-                                    <li class="@(currentController == "Customer" && currentAction == "TrainerList" ? "active" : "")">
-                                        <a asp-controller="Customer" asp-action="TrainerList">
-                                            <i class="fa fa-users me-1"></i> Trainer List
-                                        </a>
+                                    <li class="nav-item">
+                                        <a class="nav-link @(currentAction == "TrainerList" ? "active" : "")" asp-controller="Customer" asp-action="TrainerList">Trainer List</a>
                                     </li>
                                 }
                             }
-
-                            <li class="@(currentController == "Home" && currentAction == "Contact" ? "active" : "")">
-                                <a asp-controller="Home" asp-action="Contact">
-                                    <i class="fa fa-envelope me-1"></i> Contact
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Home" && currentAction == "Contact" ? "active" : "")" asp-controller="Home" asp-action="Contact">Contact</a>
                             </li>
                         </ul>
-
-                    </nav>
+                        <div class="d-flex align-items-center">
+                            @if (isSignedIn)
+                            {
+                                <span class="text-white me-2" style="margin: 0.2rem;">Hello, @user?.Name!</span>
+                                <img src="@Url.Content("~/uploads/profile/" + (user?.ProfileImageName ?? "default.png"))" class="rounded-circle me-2" width="32" height="32" alt="Avatar" style="margin: 0.2rem;" />
+                                <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0.2rem;">
+                                    <button class="btn btn-sm btn-outline-light" style="margin: 0.2rem;">Log Out</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-warning me-2" asp-controller="Account" asp-action="Register">Register</a>
+                                <a class="btn btn-sm btn-outline-light" asp-controller="Account" asp-action="Login">Log In</a>
+                            }
+                            <a class="btn btn-sm btn-warning ms-2" href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin") : Url.Action("AccessDenied", "Account"))">
+                                <i class="fa fa-cogs"></i> Admin
+                            </a>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="top-option d-flex justify-content-end align-items-center">
-
-                    @if (isSignedIn)
-                    {
-                        <span class="text-white mr-2">Hello, @user?.Name!</span>
-                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post"
-                            class="d-inline-block ml-2">
-                            <button type="submit" class="btn btn-outline-light btn-sm">Log Out</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-warning btn-sm mr-2">
-                            <i class="fa fa-user-plus mr-1"></i> Register
-                        </a>
-
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-sm mr-2">
-                            <i class="fa fa-sign-in mr-1"></i> Log In
-                        </a>
-                    }
-
-                    <a class="btn btn-warning btn-sm"
-                        href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin", new { area = "Admin" }) : Url.Action("AccessDenied", "Account"))">
-                        <i class="fa fa-cogs mr-1"></i> Admin
-                    </a>
-                </div>
-
             </div>
-        </div>
+        </nav>
     </header>
     <!-- Header End -->
 
@@ -397,3 +361,6 @@
 </body>
 
 </html>
+
+
+

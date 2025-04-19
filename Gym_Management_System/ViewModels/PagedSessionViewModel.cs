@@ -5,7 +5,8 @@ using System.Collections.Generic;
 
 public class PagedSessionViewModel
 {
-    public List<Session> Sessions { get; set; } = new List<Session>();
+    public List<SessionViewModel> Sessions { get; set; } = new ();
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }
+   
 }

@@ -62,6 +62,9 @@ namespace GymManagement.Models
 
     [ForeignKey("ReceptionistId")]
     public Receptionist? Receptionist { get; set; }
+
+    [NotMapped]
+    public bool IsBookedByCurrentUser { get; set; }
   }
 }
 

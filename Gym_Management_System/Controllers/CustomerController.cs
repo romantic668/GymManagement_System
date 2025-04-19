@@ -234,15 +234,36 @@ namespace GymManagement.Controllers
         public async Task<IActionResult> BookSession(int page = 1)
         {
             int pageSize = 6;
+            var customer = await GetCurrentCustomerAsync();
+            var bookedSessionIds = await _dbContext.Bookings
+                .Where(b => b.CustomerId == customer.Id && b.Status != BookingStatus.Canceled)
+                .Select(b => b.SessionId)
+                .ToListAsync();
             var totalSessions = await _dbContext.Sessions
+                .Include(s => s.Room)
+                .Include(s => s.GymClass)
                 .Include(s => s.Trainer)
                 .OrderBy(s => s.SessionDateTime)
                 .ToListAsync();
 
             var pagedSessions = totalSessions
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(s => new SessionViewModel
+            {
+                SessionId = s.SessionId,
+                SessionName = s.SessionName,
+                ClassName = s.GymClass.ClassName,
+                SessionDate = s.SessionDateTime,
+                RoomName = s.Room.RoomName,
+                Trainer = s.Trainer,
+                IsBookedByCurrentUser = bookedSessionIds.Contains(s.SessionId),
+                TotalBookings = _dbContext.Bookings.Count(b => b.SessionId == s.SessionId && b.Status != BookingStatus.Canceled),
+                Category = s.Category
+            })
+            .ToList();
+
+
 
             var viewModel = new PagedSessionViewModel
             {

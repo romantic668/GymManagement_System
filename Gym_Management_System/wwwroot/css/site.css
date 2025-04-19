@@ -18,7 +18,7 @@
 .home-page .start-btn {
   padding: 1rem;
   margin: 2rem;
-  background-color: #4bc1d2;
+  background-color: #f36100;
   border-radius: 200px;
   font-weight: bold;
   font-size: 1.5rem;
@@ -106,13 +106,13 @@
 }
 
 .btn.custom-btn {
-  background-color: #4bc1d2 !important;
-  border-color: #4bc1d2 !important;
+  background-color: #f36100 !important;
+  border-color: #f36100 !important;
   color: white !important;
 }
 
 a.custom-link {
-  color: #4bc1d2 !important;
+  color: #f36100 !important;
   text-decoration: none !important;
   transition: color 0.2s ease-in-out;
   margin-right: 20px;
@@ -125,7 +125,7 @@ a.custom-delete {
 }
 
 a.custom-link:hover {
-  color: #3795a0 !important;
+  color: #f36100 !important;
 }
 
 a.custom-delete:hover {
@@ -134,7 +134,7 @@ a.custom-delete:hover {
 
 .navbar-nav .nav-link.active {
   color: white !important;
-  background-color: #4bc1d2 !important;
+  background-color: #f36100 !important;
   /* 主题色 */
   border-radius: 5px;
   /* 圆角 */

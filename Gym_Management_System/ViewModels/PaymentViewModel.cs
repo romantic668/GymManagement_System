@@ -1,6 +1,6 @@
 public class PaymentViewModel
 {
-  public required decimal Price { get; set; }
-  public required string PaymentMethod { get; set; }
-  public required DateTime PaymentDate { get; set; }
+    public decimal Price { get; set; }
+    public string PaymentMethod { get; set; } = string.Empty;
+    public DateTime PaymentDate { get; set; }
 }

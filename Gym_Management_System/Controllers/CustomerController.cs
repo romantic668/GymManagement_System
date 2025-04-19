@@ -230,34 +230,67 @@ namespace GymManagement.Controllers
         }
 
         // 5. Book a Session
-        public async Task<IActionResult> BookSession()
+        [HttpGet]
+        public async Task<IActionResult> BookSession(int page = 1)
         {
-            var sessions = await _dbContext.Sessions
+            int pageSize = 6;
+            var totalSessions = await _dbContext.Sessions
                 .Include(s => s.Trainer)
-                .Where(s => s.SessionDateTime > DateTime.Now)
+                .OrderBy(s => s.SessionDateTime)
                 .ToListAsync();
 
-            return View(sessions);  // 返回 Session 选择视图
+            var pagedSessions = totalSessions
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new PagedSessionViewModel
+            {
+                Sessions = pagedSessions,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling(totalSessions.Count / (double)pageSize)
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> BookSession(int sessionId)
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> MarkBookingPending([FromBody] BookingRequest request)
         {
-            var customer = await GetCurrentCustomerAsync();  // 获取 Customer
+            if (request == null || request.SessionId <= 0)
+                return BadRequest(new { error = "Invalid session id." });
+
+            var customer = await GetCurrentCustomerAsync();
+            if (customer == null)
+                return Unauthorized(new { error = "Customer not found." });
+
+            var session = await _dbContext.Sessions.FindAsync(request.SessionId);
+            if (session == null)
+                return NotFound(new { error = "Session not found." });
 
             var booking = new Booking
             {
-                SessionId = sessionId,
-                UserId = customer.Id,  // 使用 customer.Id
-                BookingDate = DateTime.Now
+                SessionId = request.SessionId,
+                CustomerId = customer.Id,
+                UserId = customer.Id,
+                BookingDate = DateTime.Now,
+                Status = BookingStatus.Pending
             };
 
-            _dbContext.Bookings.Add(booking);  // 将预订加入数据库
-            await _dbContext.SaveChangesAsync();  // 保存更改
-
-            TempData["Success"] = "Session booked!";  // 预订成功信息
-            return RedirectToAction("MyBookings");  // 重定向到 MyBookings 页面
+            try
+            {
+                _dbContext.Bookings.Add(booking);
+                await _dbContext.SaveChangesAsync();
+                return Ok(new { message = "Booking set to pending." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+            }
         }
+
+
 
         // 6. Trainer List
         public async Task<IActionResult> TrainerList()

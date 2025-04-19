@@ -8,7 +8,7 @@ using GymManagement.Services;
 using GymManagement.ViewModels;
 using GymManagement.Models;
 using GymManagement.Helpers;
-using GymManagement.Areas.Admin.Models; // 👈 确保有这个命名空间
+using GymManagement.Areas.Admin.Models; 
 
 
 namespace GymManagement.Areas.Admin.Controllers
@@ -32,11 +32,19 @@ namespace GymManagement.Areas.Admin.Controllers
     }
 
 
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(int page = 1, string keyword = "")
     {
-      const int PageSize = 7;
-
+      const int PageSize = 10;
+      ViewBag.Keyword = keyword;
       var allUsers = userManager.Users;
+
+      // fuzzy query
+      if (!string.IsNullOrWhiteSpace(keyword))
+      {
+          allUsers = allUsers.Where(u =>
+              u.UserName.Contains(keyword) || u.Name.Contains(keyword));
+      }
+
       var usersPage = allUsers
           .OrderBy(u => u.UserName)
           .Skip((page - 1) * PageSize)
@@ -59,7 +67,7 @@ namespace GymManagement.Areas.Admin.Controllers
           TotalItems = allUsers.Count()
         }
       };
-
+      ViewBag.Keyword = keyword; 
       return View(model);
     }
 
@@ -334,13 +342,5 @@ namespace GymManagement.Areas.Admin.Controllers
 
       return PartialView("_UserTableBody", model); // ✅ 只返回匹配项
     }
-
-
-
-
-
-
-
-
   }
 }

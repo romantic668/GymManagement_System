@@ -241,8 +241,11 @@
                         <div class="d-flex align-items-center">
                             @if (isSignedIn)
                             {
-                                <span class="text-white me-2" style="margin: 0.2rem;">Hello, @user?.Name!</span>
-                                <img src="@Url.Content("~/uploads/profile/" + (user?.ProfileImageName ?? "default.png"))" class="rounded-circle me-2" width="32" height="32" alt="Avatar" style="margin: 0.2rem;" />
+                                <a asp-controller="Account" asp-action="ViewProfile" class="d-flex align-items-center text-white text-decoration-none me-2" style="margin: 0.2rem;">
+                                    <img src="@Url.Content("~/uploads/profile/" + (user?.ProfileImageName ?? "default.png"))" class="rounded-circle me-1" width="32" height="32" alt="Avatar" />
+                                    <span>@user?.Name</span>
+                                </a>
+
                                 <form asp-controller="Account" asp-action="Logout" method="post" style="margin: 0.2rem;">
                                     <button class="btn btn-sm btn-outline-light" style="margin: 0.2rem;">Log Out</button>
                                 </form>

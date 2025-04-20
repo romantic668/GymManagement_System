@@ -252,9 +252,11 @@
                                 <a class="btn btn-sm btn-outline-warning me-2" asp-controller="Account" asp-action="Register">Register</a>
                                 <a class="btn btn-sm btn-outline-light" asp-controller="Account" asp-action="Login">Log In</a>
                             }
-                            <a class="btn btn-sm btn-warning ms-2" href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin") : Url.Action("AccessDenied", "Account"))">
+                            <a class="btn btn-sm btn-warning ms-2"
+                            href="@(User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin", new { area = "Admin" }) : Url.Action("AccessDenied", "Account"))">
                                 <i class="fa fa-cogs"></i> Admin
                             </a>
+
                         </div>
                     </div>
                 </div>

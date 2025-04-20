@@ -392,6 +392,7 @@ public async Task<IActionResult> ToggleAvailability(bool isAvailable)
     }
 
 
+
     [Authorize]
 [HttpGet]
 public async Task<IActionResult> EditProfile()

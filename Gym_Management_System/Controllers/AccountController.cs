@@ -353,6 +353,8 @@ namespace GymManagement.Controllers
       return View(vm);
     }
 
+
+
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> EditProfile()

@@ -65,7 +65,7 @@ namespace GymManagement.Controllers
                 {
                     BookingId = b.BookingId,
                     ClassName = b.Session.GymClass.ClassName,
-                    SessionDate = b.Session.SessionDateTime,
+                    SessionDateTime = b.Session.SessionDateTime,
                     Status = b.Status.ToString(),
                     TrainerName = b.Session.Trainer.Name,
                     RoomName = b.Session.Room.RoomName,
@@ -73,8 +73,8 @@ namespace GymManagement.Controllers
                 })
                 .ToListAsync();
 
-            var upcoming = allBookingVMs.Where(b => b.SessionDate > now).ToList();
-            var past = allBookingVMs.Where(b => b.SessionDate <= now).ToList();
+            var upcoming = allBookingVMs.Where(b => b.SessionDateTime > now).ToList();
+            var past = allBookingVMs.Where(b => b.SessionDateTime <= now).ToList();
 
             var vm = new CustomerDashboardViewModel
             {

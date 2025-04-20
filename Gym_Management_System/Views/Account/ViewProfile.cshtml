@@ -128,14 +128,14 @@
     <tr>
         <td class="profile-label">AVAILABLE</td>
         <td class="profile-value">
-            <button id="availability-toggle"
-                    class="btn btn-sm @(Model.IsAvailable == true ? "btn-success" : "btn-secondary")"
-                    data-available="@Model.IsAvailable.ToString().ToLower()">
-                @(Model.IsAvailable == true ? "Available" : "Not Available")
-            </button>
+            <form asp-action="ToggleAvailability" method="post">
+<input type="hidden" name="isAvailable" value="@((Model.IsAvailable != true).ToString().ToLower())" />
+                <button type="submit" class="btn btn-sm @(Model.IsAvailable == true ? "btn-success" : "btn-secondary")">
+                    @(Model.IsAvailable == true ? "Available" : "Not Available")
+                </button>
+            </form>
         </td>
     </tr>
-
     <tr>
         <td class="profile-label">NOTES</td>
         <td class="profile-value">@Model.Notes</td>

@@ -5868,6 +5868,24 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\gymclass\882811dc-9e7f-4171-be7e-aec49df234b3.jpeg'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\gymclass\b5ecf51c-bee4-4e39-a880-0c860337d619.jpeg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>GymManagement</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/GymManagement</BasePath>
+      <RelativePath>uploads/gymclass/b5ecf51c-bee4-4e39-a880-0c860337d619.jpeg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>4xytziq1ye</Fingerprint>
+      <Integrity>CMGFFGvog5YprPTN333Dn4d/D0PbFPol7SVG0K+U8bg=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\gymclass\b5ecf51c-bee4-4e39-a880-0c860337d619.jpeg'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\gymclass\class-default.jpg'))">
       <SourceType>Package</SourceType>
       <SourceId>GymManagement</SourceId>

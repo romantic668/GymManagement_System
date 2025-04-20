@@ -329,17 +329,21 @@ namespace GymManagement.Controllers
     }
   [HttpPost]
   [Authorize(Roles = "Receptionist")]
-  public async Task<IActionResult> ToggleAvailability(bool isAvailable)
-  {
-      var user = await _userManager.GetUserAsync(User);
-      if (user is not Receptionist receptionist) return Unauthorized();
+public async Task<IActionResult> ToggleAvailability(bool isAvailable)
+{
+    var user = await _userManager.GetUserAsync(User);
+    if (user is not Receptionist receptionist) return Unauthorized();
 
-      receptionist.IsAvailable = isAvailable;
-      await _userManager.UpdateAsync(receptionist);
+    receptionist.IsAvailable = isAvailable;
+    await _userManager.UpdateAsync(receptionist);
 
-      TempData["Toast"] = $"Availability set to {(isAvailable ? "Available" : "Not Available")}";
-      return RedirectToAction("ViewProfile");
-  }
+    // ✅ 刷新当前登录状态，才能立刻反映在右上角
+    await _signInManager.RefreshSignInAsync(receptionist);
+
+    TempData["Toast"] = $"Availability set to {(isAvailable ? "Available" : "Not Available")}";
+    return RedirectToAction("ViewProfile");
+}
+
 
 
 

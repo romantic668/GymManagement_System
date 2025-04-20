@@ -65,7 +65,7 @@ namespace GymManagement.Controllers
         {
             BookingId = b.BookingId,
             ClassName = b.Session.GymClass.ClassName,
-            SessionDate = b.Session.SessionDateTime,
+            SessionDateTime = b.Session.SessionDateTime,
             Status = b.Status.ToString(),
             TrainerName = b.Session.Trainer.Name,
             RoomName = b.Session.Room.RoomName,
@@ -74,8 +74,8 @@ namespace GymManagement.Controllers
         .ToListAsync();
 
     // 分组
-    var upcomingAll = allBookingVMs.Where(b => b.SessionDate > now).ToList();
-    var past = allBookingVMs.Where(b => b.SessionDate <= now).ToList();
+    var upcomingAll = allBookingVMs.Where(b => b.SessionDateTime > now).ToList();
+    var past = allBookingVMs.Where(b => b.SessionDateTime <= now).ToList();
 
     // 分页
     var totalPages = (int)Math.Ceiling(upcomingAll.Count / (double)pageSize);
@@ -254,7 +254,7 @@ namespace GymManagement.Controllers
                 SessionId = s.SessionId,
                 SessionName = s.SessionName,
                 ClassName = s.GymClass.ClassName,
-                SessionDate = s.SessionDateTime,
+                SessionDateTime = s.SessionDateTime,
                 RoomName = s.Room.RoomName,
                 Trainer = s.Trainer,
                 IsBookedByCurrentUser = bookedSessionIds.Contains(s.SessionId),
@@ -269,7 +269,7 @@ namespace GymManagement.Controllers
             {
                 Sessions = pagedSessions,
                 CurrentPage = page,
-                TotalPages = (int)Math.Ceiling(totalSessions.Count / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(totalSessions.Count() / (double)pageSize)
             };
 
             return View(viewModel);

@@ -125,7 +125,7 @@
                     <h5 class="card-title">@session.SessionName</h5>
                     <p class="card-text mb-4">
                         <strong>Trainer:</strong> @session.Trainer.Name <br />
-                        <strong>Date & Time:</strong> @session.SessionDateTime.ToString("MMM d, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture)
+                        <strong>Date & Time:</strong> @session.SessionDateTime.ToString("MMM dd, yyyy h:mm tt", System.Globalization.CultureInfo.InvariantCulture)
                     </p>
                     @if (isBooked)
                     {

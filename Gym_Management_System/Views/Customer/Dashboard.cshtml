@@ -207,7 +207,7 @@
                         <td>@b.TrainerName</td>
                         <td>@b.RoomName</td>
                         <td>@b.Category</td>
-                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
+                        <td>@b.SessionDateTime.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>
                             <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
                                                  b.Status == "Pending" ? "badge-warning" :
@@ -289,7 +289,7 @@
                         <td>@b.TrainerName</td>
                         <td>@b.RoomName</td>
                         <td>@b.Category</td>
-                        <td>@b.SessionDate.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
+                        <td>@b.SessionDateTime.ToString("MMM/dd/yyyy HH:mm", CultureInfo.InvariantCulture)</td>
                         <td>
                             <span class="badge @(b.Status == "Confirmed" ? "badge-success" :
                                                  b.Status == "Pending" ? "badge-warning" :
